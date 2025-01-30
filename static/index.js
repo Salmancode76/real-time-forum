@@ -4,10 +4,6 @@ import { s_test } from "./Handlers/s_testing.js";
 import {login} from "./Handlers/login.js"
 
 handleInitialLoad();
-window.addEventListener('popstate', () => {
-    const path = window.location.pathname;
-    navigateTo(path);
-});
 
 function handleInitialLoad() {
     const path = window.location.pathname;
