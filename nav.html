@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+      
+
+        nav {
+            color: white;
+            background-color: #363636;
+            position: relative;
+            width: 100%;
+         
+      
+        }
+
+        ul {
+            list-style-type: none;
+            display: flex;
+            align-items: center;
+            font-size: 3vh;
+            padding: 1em;
+         
+        }
+
+        .header {
+            font-size: 2em;
+            margin-right: auto;  
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            
+        }
+
+        .nav-links a {
+            color: #bdb9b8;
+            text-decoration: none;
+            padding: 7px;
+            border-radius: 10px;
+            white-space: nowrap;  
+        }
+
+        li a:hover {
+            background-color: #B5734C;
+            color: white;
+            transition: background-color 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        #hamICON {
+            display: none;
+            cursor: pointer;
+            width: 6vh;
+            height: 6vh;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+                width: 100%;
+                background: #363636;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1;
+               
+            }
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                padding: 1em 0;
+
+            }
+                .nav-links a {
+                    display: block;
+                    width: 100%;
+
+                }
+            
+            .nav-links li {
+                text-align: center;
+                padding: 0.5em 0;
+            }
+            li{
+                width: 100%;
+            }
+
+            #hamICON {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            nav > ul {
+                padding-right: 60px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="header">Community Forum</li>
+            <div class="nav-links">
+                <li><a href="#">Posts</a></li>
+                <li><a href="#">All users</a></li>
+                <li><a href="#">Private Messages</a></li>
+                <li><a href="#">Welcome, Stranger</a></li>
+                <li><a href="#">Logout</a></li>
+            </div>
+            <img id="hamICON" src="/icons8-hamburger.svg" alt="Menu">
+        </ul>
+    </nav>
+</body>
+<script>
+    document.getElementById('hamICON').addEventListener('click', function() {
+        const links = document.querySelector('.nav-links');
+        links.classList.toggle('active');
+    });
+</script>
+</html>
