@@ -8,9 +8,8 @@
         * {
             margin: 0;
             padding: 0;
-            width: 100%;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, sans-serif;
         }
       
 
@@ -19,7 +18,8 @@
             background-color: #363636;
             position: relative;
             width: 100%;
-         
+            overflow-x: auto;
+
       
         }
 
@@ -29,7 +29,8 @@
             align-items: center;
             font-size: 3vh;
             padding: 1em;
-         
+            flex-wrap: nowrap; 
+
         }
 
         .header {
@@ -41,7 +42,9 @@
             display: flex;
             align-items: center;
             gap: 1em;
-            
+            white-space: nowrap; 
+
+
         }
 
         .nav-links a {
@@ -64,6 +67,7 @@
             width: 6vh;
             height: 6vh;
         }
+      
 
         @media (max-width: 900px) {
             .nav-links {
@@ -77,6 +81,8 @@
                 z-index: 1;
                
             }
+            
+            
             .nav-links.active {
                 display: flex;
                 flex-direction: column;
@@ -94,7 +100,8 @@
                 padding: 0.5em 0;
             }
             li{
-                width: 100%;
+                text-align: center;
+                width: 90%;
             }
 
             #hamICON {
@@ -104,12 +111,18 @@
                 top: 50%;
                 transform: translateY(-50%);
             }
+            nav{
+                overflow-x:visible;
+
+            }
 
             nav > ul {
                 padding-right: 60px;
                 flex-wrap: wrap;
             }
         }
+
+        
     </style>
 </head>
 <body>

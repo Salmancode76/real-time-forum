@@ -1,26 +1,21 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 
-}
 
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
 }
-.signup_main{
+
+.signup_main {
     display: flex;
-    flex-direction: row;
-    width: 100vw;
     justify-content: center;
     align-items: center;
-    height: 100dvh;        
-    background-color: #1A1A1A;
+    min-height: 100vh;
+    padding: 1rem;
     color: white;
-    
-}
+    background-color: #1A1A1A;
 
+
+}
 .signup_container{
     
     display: flex;
@@ -34,6 +29,7 @@ body {
     flex-wrap: wrap;  
     gap: 6px;
     font-weight: bold;
+    
 
 }
 

@@ -11,13 +11,12 @@ body {
 }
 .login_main{
     display: flex;
-    flex-direction: row;
-    width: 100vw;
     justify-content: center;
     align-items: center;
-    height: 100dvh;        
-    background-color: #1A1A1A;
+    min-height: 90vh;
+    padding: 1rem;
     color: white;
+    background-color: #1A1A1A;
   
 }
 .login_container{
@@ -66,7 +65,6 @@ body {
     display: inline-block;
     background-color: #B5734C;
 
-    padding: 0.5rem 1rem;
     color: white;
     text-decoration: none;
     border-radius: 10px;
