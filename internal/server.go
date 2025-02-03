@@ -1,4 +1,4 @@
-package server
+package internal
 
 import (
 	"log"
@@ -7,10 +7,6 @@ import (
 
 	"github.com/gorilla/websocket"
 )
-
-type Server struct {
-	HTTP *http.Server
-}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,

@@ -1,8 +1,10 @@
-package server
+package internal
 
-import "net/http"
+import (
+	"net/http"
+)
 
-func Routes() http.Handler {
+func (app *App) Routes() http.Handler {
 
 	mux := http.NewServeMux()
 
@@ -10,21 +12,18 @@ func Routes() http.Handler {
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// WebSocket route
 	mux.HandleFunc("/ws", handleWebSocket)
 
-	// Other routes
 	mux.HandleFunc("/s", s_test)
 
 	mux.HandleFunc("GET /sign", getHome)
 
-	mux.HandleFunc("POST /sign", postsign)
+	mux.HandleFunc("POST /sign", app.postsign)
 
 	mux.HandleFunc("GET /login", getHome)
 
-	mux.HandleFunc("POST /login", postLogin)
+	mux.HandleFunc("POST /login", app.postLogin)
 
-	// Serve HTML for the root route
 	mux.HandleFunc("/", getHome)
 
 	return mux

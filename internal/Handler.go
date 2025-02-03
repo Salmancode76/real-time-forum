@@ -1,10 +1,12 @@
-package server
+package internal
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -12,6 +14,36 @@ import (
 
 var data map[string]interface{}
 
+func (app *App) postsign(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+
+	if err != nil {
+		return
+	}
+	fmt.Printf("User new struct", user)
+
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Data received",
+		"data":    data,
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(response)
+	fmt.Println(response)
+
+	int_age, err := strconv.Atoi(user.Age)
+
+	if err != nil {
+		log.Print("Bad age")
+	}
+
+	app.Users.Insert(user.Username, user.Email,
+		user.Password, user.Gender,
+		user.FirstName, user.LastName, int_age)
+
+}
 func s_test(w http.ResponseWriter, r *http.Request) {
 	// Check if the Accept header is set to application/json
 	if r.Header.Get("Accept") == "application/json" {
@@ -36,7 +68,7 @@ func getHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func postsign(w http.ResponseWriter, r *http.Request) {
+func (app *App) postLogin(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&data)
 
 	if err != nil {
@@ -44,32 +76,12 @@ func postsign(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(data)
 
-	response := map[string]interface{}{
-		"status":  "success",
-		"message": "Data received",
-		"data":    data,
-	}
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(response)
-	fmt.Println(response)
-
-}
-
-func postLogin(w http.ResponseWriter, r *http.Request) {
-	err := json.NewDecoder(r.Body).Decode(&data)
-
-	if err != nil {
-		return
-	}
-	fmt.Println(data)
-
-	type User struct {
+	type Userz struct {
 		Uename   string `json:"uename"`
 		Password string `json:"password"`
 	}
 
-	var user User
+	var user Userz
 
 	if uename, ok := data["uename"].(string); ok {
 		user.Uename = uename
@@ -110,7 +122,7 @@ func Cookies(w http.ResponseWriter, uename string) {
 	session_cookie := &http.Cookie{
 		Name:     "session",
 		Value:    sessionID,
-		MaxAge:   900, // 15 minutes
+		MaxAge:   900,
 		Expires:  expiration,
 		HttpOnly: false,
 		Path:     "/",
@@ -119,6 +131,6 @@ func Cookies(w http.ResponseWriter, uename string) {
 	http.SetCookie(w, session_cookie)
 
 	fmt.Println(expiration)
-	fmt.Printf("New cookie set: %+v\n", session_cookie) // Log for debugging
+	fmt.Printf("New cookie set: %+v\n", session_cookie)
 
 }
