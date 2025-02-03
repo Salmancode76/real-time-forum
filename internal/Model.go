@@ -3,7 +3,7 @@ package internal
 import (
 	"database/sql"
 	"net/http"
-	"real-time-forum/Internal/Handlers"
+	"real-time-forum/internal/handlers"
 )
 
 type User struct {
@@ -18,7 +18,7 @@ type User struct {
 
 type App struct {
 	Server *Server
-	Users  *Handlers.UserModel
+	Users  *handlers.UserModel
 	DB     *sql.DB
 }
 type Server struct {

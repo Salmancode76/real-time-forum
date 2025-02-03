@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	internal "real-time-forum/Internal"
-	"real-time-forum/Internal/Handlers"
+	"real-time-forum/internal"
+	"real-time-forum/internal/handlers"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,9 +19,8 @@ func main() {
 
 	app := &internal.App{
 		DB:    db,
-		Users: &Handlers.UserModel{DB: db},
+		Users: &handlers.UserModel{DB: db},
 	}
-
 	s := internal.Server{
 		HTTP: &http.Server{
 			Addr:         ":8080",
