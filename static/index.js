@@ -1,7 +1,7 @@
-import { Home } from './Handlers/Home.js';
-import { signup } from './Handlers/signup.js';
-import { s_test } from "./Handlers/s_testing.js";
-import {login} from "./Handlers/login.js"
+import { Home } from './views/Home.js';
+import { signup } from './views/signup.js';
+import { s_test } from "./views/s_testing.js";
+import {login} from "./views/login.js"
 
 handleInitialLoad();
 
@@ -30,7 +30,7 @@ async function navigateTo(route) {
                 <li><a href="#">Welcome, Stranger</a></li>
                 <li><a href="#">Logout</a></li>
             </div>
-            <img id="hamICON" src="/static/icons8-hamburger.svg" alt="Menu">
+            <img id="hamICON" src="/static/images/ham_menu.svg" alt="Menu">
         </ul>
     </nav>
     

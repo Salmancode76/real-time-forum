@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"real-time-forum/internal"
-	"real-time-forum/internal/handlers"
+	"real-time-forum/internal/models"
+	"real-time-forum/internal/repository"
+	"real-time-forum/internal/router"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -17,14 +18,18 @@ func main() {
 		log.Fatal("Something bad happened while opening the database:", err)
 	}
 
-	app := &internal.App{
-		DB:    db,
-		Users: &handlers.UserModel{DB: db},
+	app := &models.App{
+		DB:     db,
+		Users:  &repository.UserModel{DB: db},
+		Server: &models.Server{},
 	}
-	s := internal.Server{
+	GlobalApp := &router.GlobalApp{
+		App: app,
+	}
+	s := models.Server{
 		HTTP: &http.Server{
 			Addr:         ":8080",
-			Handler:      app.Routes(),
+			Handler:      GlobalApp.Routes(),
 			WriteTimeout: 10 * time.Second,
 			ReadTimeout:  10 * time.Second,
 		},
@@ -32,5 +37,9 @@ func main() {
 
 	app.Server = &s
 
-	app.Server.RunServer()
+	log.Println("Starting server on", GlobalApp.App.Server.HTTP.Addr)
+	if err := GlobalApp.App.Server.HTTP.ListenAndServe(); err != nil {
+		log.Fatal("Server failed to start:", err)
+	}
+
 }
