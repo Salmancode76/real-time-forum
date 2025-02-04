@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"real-time-forum/internal/models/entities"
 )
 
 type UserModel struct {
@@ -43,35 +44,32 @@ func (u *UserModel) Insert(username, email, password, gender, fname, lname strin
 	}
 
 	return nil
-
 }
 
-/*
-	func (u *UserModel) isUnique(username, email string) (models.UserData, error) {
-		var user models.UserData
+func (u *UserModel) isUnique(username, email string) (entities.UserData, error) {
+	var user entities.UserData
 
-		stmt := `SELECT UserID,
-			Username,
-			Age,
-			Gender,
-			First_Name,
-			Last_Name,
-			Email,
-			Password
-		FROM User
-		WHERE Username = ?`
+	stmt := `SELECT UserID,
+            Username,
+            Age,
+            Gender,
+            First_Name,
+            Last_Name,
+            Email,
+            Password
+        FROM User
+        WHERE Username = ?`
 
-		row, err := u.DB.Exec(stmt, username)
+	row := u.DB.QueryRow(stmt, username)
 
-		row.RowsAffected()
+	err := row.Scan(&user.UserID, &user.Username, &user.Age, &user.Gender, &user.FirstName, &user.LastName, &user.Email, &user.Password)
 
-		if err != nil {
-			return user, err
-		}
-		return user, nil
-
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
-*/
+
 func hashPassword(password string) (string, error) {
 	// Create a SHA-256 hash object
 	hash := sha256.New()
@@ -79,7 +77,6 @@ func hashPassword(password string) (string, error) {
 	// Write the password to the hash object
 	_, err := hash.Write([]byte(password))
 	if err != nil {
-
 		return "", err
 	}
 

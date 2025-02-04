@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"real-time-forum/internal/models"
+	"real-time-forum/internal/models/entities"
 	"real-time-forum/internal/repository"
 	"strconv"
 )
@@ -15,7 +15,7 @@ var data map[string]interface{}
 // PostSign is the handler for the POST /sign route
 func PostSign(userModel *repository.UserModel) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var user models.UserData
+		var user entities.UserData
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
 			http.Error(w, "Invalid data", http.StatusBadRequest)
