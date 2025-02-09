@@ -16,6 +16,12 @@ body {
 
 
 }
+#res{
+    color: red;
+    padding: 0.5em;
+    font-size: 3vh;
+    word-wrap: break-word;
+}
 .signup_container{
     
     display: flex;
@@ -58,7 +64,7 @@ body {
 .signup_container button{
     font-size: 2.5vh;
 
-    margin-top: 1em;
+    margin-top: 0.5em;
     
 }
 .signup_container button:hover{

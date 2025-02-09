@@ -16,6 +16,7 @@ export class login extends BasePage{
                 <input type="text" id="UEnametxt" name="UEnametxt" class="UEnametxt" placeholder="Enter your username or email">
                 <label for="passwordtxt">Password</label>
                 <input type="password" id="passwordtxt" name="passwordtxt" class="passwordtxt" placeholder="Enter your password">
+                 <div id="res"> </div>
                 <button type="submit">Login Up</button>
                 <div class="login_info">Don't have an account? <a href="/sign" onclick="navigateTo('/sign');return false;">Sign up here</a></div>
             </form>
@@ -37,20 +38,27 @@ export class login extends BasePage{
             password : document.getElementById('passwordtxt').value
         }
         try{
-            const response = await fetch('/login',{
-                method:'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify(FormData),
-
+            const response = await fetch("/login", {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              body: JSON.stringify(FormData),
             });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            if (!data.Success){
+                document.getElementById("res").innerText = "ERROR:  "+ data.message;
+            }else{
+                   setTimeout(() => {
+                                        navigateTo('/');
+                                    }, 2000);
+            }
             alert('Response from server: ' + JSON.stringify(data));
 
         }catch(error){

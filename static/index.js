@@ -1,7 +1,7 @@
 import { Home } from './views/Home.js';
 import { signup } from './views/signup.js';
 import { s_test } from "./views/s_testing.js";
-import {login} from "./views/login.js"
+import { login } from "./views/login.js";
 
 handleInitialLoad();
 
@@ -12,32 +12,31 @@ document.getElementById('hamICON').addEventListener('click', function() {
 
 function handleInitialLoad() {
     const path = window.location.pathname;
-    console.log(path)
+    console.log(path);
     navigateTo(path);
 }
-async function navigateTo(route) {
+
+export async function navigateTo(route) {
     const nav = document.getElementById('nav');
 
     nav.innerHTML = `
     <nav>
         <ul>
-            <li class="header">  <a href="/" onclick="navigateTo('/'); return false;">  Community Forum </a> </li>
+            <li class="header">  <a href="/" onclick="navigateTo('/');">  Community Forum </a> </li>
             <div class="nav-links">
-                <li> <a href="/" onclick="navigateTo('/'); return false;"> Posts</a></li>
+                <li><a <a href="/sign" onclick="navigateTo('/sign');"> Sign-Up</a></li>
+                <li><a <a href="/login" onclick="navigateTo('/login');"> Login</a></li>
 
-                <li><a href="#">All users</a></li>
-                <li><a href="#">Private Messages</a></li>
-                <li><a href="#">Welcome, Stranger</a></li>
-                <li><a href="#">Logout</a></li>
             </div>
             <img id="hamICON" src="/static/images/ham_menu.svg" alt="Menu">
         </ul>
     </nav>
-    
-    
-    `
+    `;
+
     const app = document.getElementById('app');
 
+
+ 
     try {
         switch (route) {
             case '/':
@@ -51,14 +50,17 @@ async function navigateTo(route) {
                 break;
             case '/login':
                 new login();
-                break
+                break;
             default:
                 app.innerHTML = "404 Not found :(";
         }
-        
 
         history.pushState(null, '', route);
     } catch (error) {
-        app.innerHTML ="500" + error
-    } 
+        app.innerHTML = "500" + error;
+    }
 }
+
+
+
+window.navigateTo = navigateTo;

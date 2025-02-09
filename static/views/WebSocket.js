@@ -11,7 +11,7 @@ function initWebSocket() {
         console.log("Message from server:", event.data);
         const outputElement = document.getElementById('output');
         if (outputElement) {
-            outputElement.innerText = event.data;
+            outputElement.innerText = event.data
         }
     };
 

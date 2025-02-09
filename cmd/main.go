@@ -19,9 +19,11 @@ func main() {
 	}
 
 	app := &models.App{
-		DB:     db,
-		Users:  &repository.UserModel{DB: db},
-		Server: &models.Server{},
+		DB:      db,
+		Users:   &repository.UserModel{DB: db},
+		Server:  &models.Server{},
+		Session: make(map[string]string),
+		UserID:  make(map[string]string),
 	}
 	GlobalApp := &router.GlobalApp{
 		App: app,

@@ -1,4 +1,5 @@
 import { BasePage } from './BasePage.js';
+import { navigateTo } from '../index.js';
 export class signup  extends BasePage{
     constructor() {
        
@@ -37,6 +38,7 @@ export class signup  extends BasePage{
 
                         <label for="password"><strong>Password</strong></label>
                         <input id="password" type="password" name="password" placeholder="Enter your password" required maxlength="200">
+                        <div id="res"> </div>
 
                         <button type="submit">Sign Up</button>
                         <span class="sign-info">Already have an account? <a href="/login" onclick="navigateTo('/login');return false;">Login here</a></span>
@@ -46,50 +48,46 @@ export class signup  extends BasePage{
         </div>
         `;
     }
-    validationSignup(formData){
-        if ( formData.username.length === 0) {
-            alert("Username cannot be empty or just spaces.");
-            return false;
+    validationSignup(formData) {
+        let error_message = "";
+    
+        if (formData.username.length === 0) {
+            error_message += "Username cannot be empty or just spaces.\n";
         }
     
         if (formData.firstName.length === 0) {
-            alert("First Name cannot be empty or just spaces.");
-            return false;
+            error_message += "First Name cannot be empty or just spaces.\n";
         }
     
-        if ( formData.lastName.length === 0) {
-            alert("Last Name cannot be empty or just spaces.");
-            return false;
+        if (formData.lastName.length === 0) {
+            error_message += "Last Name cannot be empty or just spaces.\n";
         }
-
-        if (formData.age < 0 || formData.age >150 ){
-            alert("Please enter a valid age. Age should be between 0 and 150.");
-            return false;
+    
+        if (formData.age < 0 || formData.age > 150) {
+            error_message += "Please enter a valid age. Age should be between 0 and 150.\n";
         }
-        const nameRegex = /^[A-Za-z\s]+$/; 
+    
+        const nameRegex = /^[A-Za-z\s]+$/;
         if (!nameRegex.test(formData.firstName)) {
-            alert("First name cannot contain numbers or special characters.");
-            return false;
+            error_message += "First name cannot contain numbers or special characters.\n";
         }
     
         if (!nameRegex.test(formData.lastName)) {
-            alert("Last name cannot contain numbers or special characters.");
-            return false;
+            error_message += "Last name cannot contain numbers or special characters.\n";
         }
+    
         const password = formData.password;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+    
         if (!passwordRegex.test(password)) {
-           
-           
-            alert("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @, $, !, %, *, ?, &).");
-            return false;
+            error_message += "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @, $, !, %, *, ?, &).\n";
         }
-
-        return true
-
-       
-
+    
+        if (error_message.length > 0) {
+            return error_message;
+        }
+    
+        return true;
     }
 
     setupFormSubmission() {
@@ -111,10 +109,15 @@ export class signup  extends BasePage{
                 email: document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value.trim(),
             };
+            /* COMMENTED FOR TESTING
+            const validationResult = this.validationSignup(formData);
 
-            if (!this.validationSignup(formData)) {
+            if (validationResult !== true) {
+               // alert(validationResult);
+                document.getElementById("res").innerText = "Error:  "+ validationResult;
                 return;
             }
+                */
 
             try {
                 const response = await fetch('/sign', {
@@ -130,9 +133,21 @@ export class signup  extends BasePage{
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
+                
                 const data = await response.json();
-                alert('Response from server: ' + JSON.stringify(data));
-            } catch (error) {
+                if (!data.Success){
+                    document.getElementById("res").innerText = "ERROR:  "+ data.message;
+
+                }else{
+                    document.getElementById("res").innerText = "SUCCESS:  "+ data.message;
+                    document.getElementById("res").style.color = "#2ECC71";
+                    setTimeout(() => {
+                        navigateTo('/login');
+                    }, 2000);
+
+                }
+               // alert('Response from server: ' + (data.message || 'Unknown response'));   
+             } catch (error) {
                 console.error("Form submission failed:", error);
                 alert("Form submission failed. Please try again.");
             }

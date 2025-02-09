@@ -4,15 +4,59 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"real-time-forum/internal/models"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
 
+
+
 func GetHome(w http.ResponseWriter, r *http.Request) {
 
 	http.ServeFile(w, r, "./index.html")
 
+}
+
+func Authorized(app *models.App) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+    user := r.Context().Value(contextKeyUser)
+	if user == nil {
+
+		w.WriteHeader(http.StatusSeeOther)
+
+		fmt.Println("Unauthorized")
+
+
+		return
+
+	} else {
+		fmt.Println("Authorized")
+		http.Redirect(w, r, "/", http.StatusOK) 
+	}
+
+}
+}
+func GetDashboard(w http.ResponseWriter, r *http.Request) {
+
+    user := r.Context().Value(contextKeyUser)
+    if user == nil {
+	 //w.WriteHeader(http.StatusUnauthorized)
+	//w.WriteHeader(http.StatusSeeOther)
+	//http.Redirect(w, r, "/login", http.StatusSeeOther)
+	
+	http.Redirect(w, r, "/login", http.StatusSeeOther) // 303 Redirect
+
+	//w.WriteHeader(http.StatusUnauthorized)
+	//w.Write([]byte("Unauthorized. Please log in."))
+//http.Redirect(w, r, "/login", http.StatusSeeOther)
+        //SendResponse(w, "GetDashboard", "User not logged in", false, http.StatusUnauthorized)
+
+		return
+    } else {
+        http.ServeFile(w, r, "./index.html")
+    }
 }
 
 func GenerateSessionID() string {
@@ -24,23 +68,29 @@ func GenerateSessionID() string {
 	return sessionID.String()
 }
 
-func Cookies(w http.ResponseWriter, uename string) {
-
+func Cookies(w http.ResponseWriter, userID string) string {
 	expiration := time.Now().Add(24 * time.Hour)
 	sessionID := GenerateSessionID()
 
-	session_cookie := &http.Cookie{
+	sessionCookie := &http.Cookie{
 		Name:     "session",
 		Value:    sessionID,
-		MaxAge:   900,
 		Expires:  expiration,
-		HttpOnly: false,
+		HttpOnly: true,
 		Path:     "/",
+		Secure:   false, // Set to true if using HTTPS
 	}
 
-	http.SetCookie(w, session_cookie)
+	userIDCookie := &http.Cookie{
+		Name:     "userID",
+		Value:    userID,
+		Expires:  expiration,
+		HttpOnly: true,
+		Path:     "/",
+		Secure:   false, // Set to true if using HTTPS
+	}
 
-	fmt.Println(expiration)
-	fmt.Printf("New cookie set: %+v\n", session_cookie)
-
+	http.SetCookie(w, sessionCookie)
+	http.SetCookie(w, userIDCookie)
+	return sessionID
 }

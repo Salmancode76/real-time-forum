@@ -23,13 +23,15 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("GET /sign", handlers.GetHome)
 
-	mux.HandleFunc("POST /sign", handlers.PostSign(app.Users))
+	mux.HandleFunc("POST /sign", handlers.PostSign(app.App))
 
 	mux.HandleFunc("GET /login", handlers.GetHome)
 
-	mux.HandleFunc("POST /login", handlers.PostLogin(app.Users))
+	mux.HandleFunc("POST /login", handlers.PostLogin(app.App))
 
 	mux.HandleFunc("/", handlers.GetHome)
 
-	return mux
+	mux.Handle("/auth-check", handlers.Authorized(app.App))
+
+	return handlers.MiddleWare(mux, app.App)
 }

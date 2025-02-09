@@ -15,7 +15,9 @@ type Server struct {
 }
 
 type App struct {
-	Server *Server
-	Users  *repository.UserModel
-	DB     *sql.DB
+	Server  *Server
+	Users   *repository.UserModel
+	DB      *sql.DB
+	Session map[string]string
+	UserID  map[string]string
 }
