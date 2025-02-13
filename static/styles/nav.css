@@ -9,6 +9,13 @@ nav {
 
 
 }
+#logout_link{
+    border-radius: 0.6em;
+        color: white;
+    padding: 0.7em;
+
+    background-color: #B5734C;
+}
 
 ul {
     list-style-type: none;
@@ -29,6 +36,8 @@ body {
 .header {
     font-size: 2em;
     margin-right: auto;  
+    word-break: break-all;
+    text-overflow: ellipsis;
 }
 
 .nav-links {

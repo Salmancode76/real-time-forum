@@ -21,6 +21,7 @@ func main() {
 	app := &models.App{
 		DB:      db,
 		Users:   &repository.UserModel{DB: db},
+		Posts :  &repository.PostModel{DB:db},
 		Server:  &models.Server{},
 		Session: make(map[string]string),
 		UserID:  make(map[string]string),

@@ -29,7 +29,16 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("POST /login", handlers.PostLogin(app.App))
 
+	mux.HandleFunc("/createPost", handlers.GetHome)
+
+	mux.HandleFunc("POST /createPost", handlers.CreatePost(app.App))
+
 	mux.HandleFunc("/", handlers.GetHome)
+
+	mux.HandleFunc("/api/posts",handlers.GetAllPosts(app.App))
+
+	mux.HandleFunc("/logout",handlers.Logout(app.App))
+
 
 	mux.Handle("/auth-check", handlers.Authorized(app.App))
 

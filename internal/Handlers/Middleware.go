@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/internal/models"
@@ -56,4 +57,26 @@ func MiddleWare(next http.Handler, app *models.App) http.Handler {
 
 
 	})
+}
+
+func Authorized(app *models.App) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+    user := r.Context().Value(contextKeyUser)
+	if user == nil {
+
+		w.WriteHeader(http.StatusSeeOther)
+
+		fmt.Println("Unauthorized")
+
+
+		return
+
+	} else {
+		fmt.Println("Authorized")
+		http.Redirect(w, r, "/", http.StatusOK) 
+		
+	}
+
+}
 }

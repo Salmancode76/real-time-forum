@@ -2,10 +2,11 @@ import { Home } from './views/Home.js';
 import { signup } from './views/signup.js';
 import { s_test } from "./views/s_testing.js";
 import { login } from "./views/login.js";
+import { CreatePost } from "./views/createPost.js";
 
 handleInitialLoad();
 
-document.getElementById('hamICON').addEventListener('click', function() {
+document.getElementById('hamICON').addEventListener('click', ()=> {
     const links = document.querySelector('.nav-links');
     links.classList.toggle('active');
 });
@@ -39,20 +40,24 @@ export async function navigateTo(route) {
  
     try {
         switch (route) {
-            case '/':
-                new Home();
-                break;
-            case '/s':
-                await new s_test();
-                break;
-            case '/sign':
-                new signup();
-                break;
-            case '/login':
-                new login();
-                break;
-            default:
-                app.innerHTML = "404 Not found :(";
+          case "/":
+            new Home();
+            break;
+          case "/s":
+            await new s_test();
+            break;
+          case "/sign":
+            new signup();
+            break;
+          case "/login" || "/logout":
+            new login();
+            break;
+          case "/createPost":
+            new CreatePost();
+            break;
+
+          default:
+            app.innerHTML = "404 Not found :(";
         }
 
         history.pushState(null, '', route);

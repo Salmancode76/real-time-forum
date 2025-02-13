@@ -1,0 +1,146 @@
+package repository
+
+import (
+	"database/sql"
+	"fmt"
+	"real-time-forum/internal/models/entities"
+	"strings"
+)
+
+type PostModel struct {
+	DB *sql.DB
+}
+
+func (p * PostModel) FetchAllPost()([]entities.Post,error){
+	var Posts []entities.Post
+	stmt :=`
+	
+		SELECT 
+    post.id,
+    post.title,
+    post.body,
+    post.created_at,
+    User.Username,
+    GROUP_CONCAT(category.name) AS categories
+FROM post
+INNER JOIN User
+    ON User.UserID = post.user_id
+INNER JOIN post_category
+    ON post_category.post_id = post.id
+INNER JOIN category
+    ON category.id = post_category.category_id
+GROUP BY 
+    post.id,
+    post.title,
+    post.body,
+    post.created_at,
+    User.Username;
+  `
+
+  row,err := p.DB.Query(stmt)
+
+  	if err != nil {
+		return  Posts,fmt.Errorf("failed to fetch all post: %w", err)
+	}
+
+
+	for row.Next(){
+				var Post entities.Post
+		var temp_category string
+		row.Scan(&Post.ID,&Post.Title,&Post.Content,&Post.Date,&Post.UserID,&temp_category)
+
+		 cat := strings.Split((temp_category), ",")
+	
+		Post.Categories = cat
+
+		Posts = append(Posts, Post)
+		
+	}
+
+	return Posts,nil
+}
+
+func (p * PostModel) Insert(id,title,content string , categories[]string ) (error){
+	
+	stmt:=`INSERT INTO post (
+                     title,
+                     body,
+                     created_at,
+                     user_id
+                 )
+                 VALUES (
+                     ?,
+                     ?,
+                     datetime('now'),
+                     ?
+                 );
+`
+
+	result,err := p.DB.Exec(stmt,title,content,id)
+
+	if err != nil {
+		return fmt.Errorf("failed to insert post: %w", err)
+	}
+
+	PostID,err:= result.LastInsertId()
+
+	stmt2:= `INSERT INTO post_category (
+                              post_id,
+                              category_id
+                          )
+                          VALUES (
+                              ?,
+                              ?
+                          );
+`
+
+
+	All_categories,err := p.GetAllCategories();
+
+	if err !=nil{
+		return err
+	}
+	for i :=0;i<len(categories);i++{
+		fmt.Println(All_categories[categories[i]])
+
+
+
+		_,err:= p.DB.Exec(stmt2,PostID,All_categories[categories[i]])
+		if err !=nil{
+			return fmt.Errorf("failed to insert cate post: %w", err)
+		}
+
+		
+	}
+	
+	return nil
+
+
+}
+
+
+func (p *PostModel) GetAllCategories() (map[string]string, error) {
+	stmt := `SELECT id,
+       name
+  FROM category;
+`
+
+	rows,err :=p.DB.Query(stmt)
+
+		if err != nil {
+		return nil, fmt.Errorf("failed to fetch categories: %w", err)
+	}
+	defer rows.Close()
+
+	categories := make(map[string]string)
+
+	for rows.Next(){
+		var id,name string
+		rows.Scan(&id,&name)
+		categories[name]=id
+	}
+	
+
+	return categories,nil
+
+}

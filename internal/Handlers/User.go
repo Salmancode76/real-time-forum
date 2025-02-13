@@ -12,7 +12,94 @@ import (
 
 var data map[string]interface{}
 
+func Logout(app *models.App) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, ok := r.Context().Value(contextKeyUser).(entities.UserData)
 
+		fmt.Println(user)
+		if !ok{
+            http.Error(w, "User not found", http.StatusUnauthorized)
+			return
+		}
+
+		tempID := strconv.Itoa(user.UserID)
+
+		delete(app.Session,tempID)
+		delete(app.UserID,user.Username)
+		 w.WriteHeader(http.StatusNoContent) 
+		
+
+	}
+}
+
+
+func GetAllPosts(app *models.App) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        posts, err := app.Posts.FetchAllPost()
+        if err != nil {
+            log.Println("Can't get posts ", err)
+            http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+            return
+        }
+		//fmt.Println(posts)
+		SendResponse(w,"Fetch Posts","",true,http.StatusOK,posts)
+
+    }
+}
+
+
+func GetHome(w http.ResponseWriter, r *http.Request) {
+
+	http.ServeFile(w, r, "./index.html")
+
+}
+
+
+func CreatePost(app *models.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var post entities.Post
+		err:= json.NewDecoder(r.Body).Decode(&post)
+
+		if err !=nil{
+				http.Error(w, "Invalid data", http.StatusBadRequest)
+			return
+		}
+		sCookie, err := r.Cookie("session")
+		if err != nil {
+			http.Error(w, "Unable to retrieve session", http.StatusInternalServerError)
+			return
+		}
+
+		IDCookie, err := r.Cookie("userID")
+		if err != nil {
+			http.Error(w, "Unable to retrieve session", http.StatusInternalServerError)
+			return
+		}
+
+		if app.Session[IDCookie.Value]!=sCookie.Value{
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
+		return	
+		}
+		post.UserID = IDCookie.Value
+
+		if err !=nil{
+			log.Print("ID Invalid")
+		}
+
+
+		/*
+				categories,err := app.Posts.GetAllCategories()
+
+		for id,namr := range categories{
+			fmt.Println(id,"   ", namr)
+		}
+		*/		
+		app.Posts.Insert(post.UserID,post.Title,post.Content,post.Categories)
+		
+		//post.User = r.
+		log.Printf("POSTS ", post)
+	}
+}
 
 // PostSign is the handler for the POS
 func PostSign(app *models.App) http.HandlerFunc {

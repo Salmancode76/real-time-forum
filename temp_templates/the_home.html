@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Forum - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1A1A1A;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            background-color: #363636;
+            padding: 1rem 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: #bdb9b8;
+            text-decoration: none;
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-item:hover {
+            background-color: #B5734C;
+            color: white;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #B5734C;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #a56843;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .posts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .post-card {
+            background-color: #363636;
+            border-radius: 5px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .post-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-title a {
+            color: #B5734C;
+            text-decoration: none;
+        }
+
+        .post-title a:hover {
+            text-decoration: underline;
+        }
+
+        .post-meta {
+            font-size: 0.875rem;
+            color: #bdb9b8;
+            margin-bottom: 1rem;
+        }
+
+        .post-content {
+            margin-bottom: 1rem;
+        }
+
+        .read-more {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            color: #B5734C;
+            text-decoration: none;
+            border: 1px solid #B5734C;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .read-more:hover {
+            background-color: #B5734C;
+            color: white;
+        }
+
+        #hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: #363636;
+                padding: 1rem 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-item {
+                margin: 0.5rem 0;
+            }
+
+            #hamburger {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">Community Forum</a>
+            <button id="hamburger">☰</button>
+            <div class="nav-links">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                <a href="users.html" class="nav-item">Users</a>
+                <a href="messages.html" class="nav-item">Messages</a>
+                <span class="nav-item">Welcome, Stranger</span>
+                <a href="#" class="btn" id="logout-btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <a href="create-post.html" class="btn">Create Post</a>
+        </div>
+        <div class="posts-container" id="posts-container">
+            <!-- Posts will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <script>
+        // Sample posts data
+        const posts = [
+            {
+                id: 1,
+                title: "The Future of AI in Web Development",
+                author: "John Doe",
+                date: "June 1, 2023",
+                category: "Technology",
+                content: "Artificial Intelligence is revolutionizing the way we build and interact with websites. From chatbots to personalized user experiences, AI is becoming an integral part of modern web development."
+            },
+            {
+                id: 2,
+                title: "10 Essential CSS Tricks Every Developer Should Know",
+                author: "Jane Smith",
+                date: "May 28, 2023",
+                category: "Web Design",
+                content: "CSS is a powerful tool for creating beautiful and responsive web designs. In this post, we'll cover 10 essential CSS tricks that can help you take your web development skills to the next level."
+            },
+            {
+                id: 3,
+                title: "The Rise of Progressive Web Apps",
+                author: "Alex Johnson",
+                date: "May 25, 2023",
+                category: "Mobile Development",
+                content: "Progressive Web Apps (PWAs) are changing the landscape of mobile web development. Combining the best of web and native apps, PWAs offer a seamless user experience across devices."
+            }
+        ];
+
+        // Function to create post cards
+        function createPostCard(post) {
+            return `
+                <div class="post-card">
+                    <h2 class="post-title"><a href="post.html?id=${post.id}">${post.title}</a></h2>
+                    <div class="post-meta">
+                        <span>By ${post.author}</span> • <span>${post.date}</span> • <span>${post.category}</span>
+                    </div>
+                    <p class="post-content">${post.content}</p>
+                    <a href="post.html?id=${post.id}" class="read-more">Read More</a>
+                </div>
+            `;
+        }
+
+        // Populate posts
+        const postsContainer = document.getElementById('posts-container');
+        posts.forEach(post => {
+            postsContainer.innerHTML += createPostCard(post);
+        });
+
+        // Mobile menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Logout functionality
+        const logoutBtn = document.getElementById('logout-btn');
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Add logout logic here
+            console.log('Logout clicked');
+        });
+    </script>
+</body>
+
+</html>
