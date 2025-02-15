@@ -3,12 +3,57 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"real-time-forum/internal/models/entities"
 	"strings"
 )
 
 type PostModel struct {
 	DB *sql.DB
+}
+func (p *PostModel) FindPost(id string) (entities.Post,error) {
+	var Post entities.Post
+	var temp_category string
+
+	stmt := `SELECT 
+			post.id,
+			post.title,
+			post.body,
+			post.created_at,
+			User.Username,
+			GROUP_CONCAT(category.name) AS categories
+		FROM post
+		INNER JOIN User
+			ON User.UserID = post.user_id
+		INNER JOIN post_category
+			ON post_category.post_id = post.id
+		INNER JOIN category
+			ON category.id = post_category.category_id
+		WHERE post.id = ?
+		GROUP BY 
+			post.id,
+			post.title,
+			post.body,
+			post.created_at,
+			User.Username;`
+
+	row := p.DB.QueryRow(stmt, id)
+
+	err := row.Scan(&Post.ID, &Post.Title, &Post.Content, &Post.Date, &Post.UserID, &temp_category)
+	
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("No post found with ID:", id)
+		} else {
+			log.Println("Failed to fetch the post:", err)
+		}
+		return Post,err
+	}
+
+	Post.Categories = strings.Split(temp_category, ",")
+
+	log.Println(Post)
+	return Post,nil
 }
 
 func (p * PostModel) FetchAllPost()([]entities.Post,error){

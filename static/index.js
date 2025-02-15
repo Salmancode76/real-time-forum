@@ -3,6 +3,7 @@ import { signup } from './views/signup.js';
 import { s_test } from "./views/s_testing.js";
 import { login } from "./views/login.js";
 import { CreatePost } from "./views/createPost.js";
+import { ViewPost} from "./views/ViewPost.js"
 
 handleInitialLoad();
 
@@ -12,14 +13,24 @@ document.getElementById('hamICON').addEventListener('click', ()=> {
 });
 
 function handleInitialLoad() {
-    const path = window.location.pathname;
+  //take the path with the parameters
+    const path = window.location.pathname + window.location.search;
     console.log(path);
     navigateTo(path);
 }
 
+//handle navigation
 export async function navigateTo(route) {
-    const nav = document.getElementById('nav');
+  
+     console.log("Navigating to:", route);
 
+     const url = new URL(route, window.location.origin);
+     const path = url.pathname;
+
+     console.log("Path:", path);
+
+
+    const nav = document.getElementById("nav");
     nav.innerHTML = `
     <nav>
         <ul>
@@ -39,7 +50,7 @@ export async function navigateTo(route) {
 
  
     try {
-        switch (route) {
+        switch (path) {
           case "/":
             new Home();
             break;
@@ -49,18 +60,31 @@ export async function navigateTo(route) {
           case "/sign":
             new signup();
             break;
-          case "/login" || "/logout":
+          case "/login":
+            new login();
+            break;
+          case "/logout":
             new login();
             break;
           case "/createPost":
             new CreatePost();
             break;
+         case "/post":
+            const id = url.searchParams.get("id");
+          if (id) {
+            await new ViewPost(id);
+          } else {
+            app.innerHTML = "Post ID is missing!";
+          }
+          break;
 
+       
+            
           default:
             app.innerHTML = "404 Not found :(";
         }
 
-        history.pushState(null, '', route);
+        history.pushState(null, "", url.pathname + url.search);
     } catch (error) {
         app.innerHTML = "500" + error;
     }
@@ -68,4 +92,5 @@ export async function navigateTo(route) {
 
 
 
+//Making the router function golablly accessable
 window.navigateTo = navigateTo;

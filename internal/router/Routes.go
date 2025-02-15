@@ -39,6 +39,7 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("/logout",handlers.Logout(app.App))
 
+	mux.HandleFunc("/post",handlers.ViewPost(app.App))
 
 	mux.Handle("/auth-check", handlers.Authorized(app.App))
 

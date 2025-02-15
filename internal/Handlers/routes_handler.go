@@ -12,6 +12,30 @@ import (
 
 var data map[string]interface{}
 
+func ViewPost (app * models.App)http.HandlerFunc{
+		return func(w http.ResponseWriter, r *http.Request) {
+		var Post entities.Post
+		id := r.URL.Query().Get("id")
+		log.Println(id)
+		Post,err :=app.Posts.FindPost(id)
+
+
+		if err!=nil{
+			log.Println("Error :", err,Post)
+		}
+				
+		log.Print(Post)
+		
+	   if r.Header.Get("Accept") == "application/json" {
+            posts := []entities.Post{Post}
+            SendResponse(w, "Fetch Post", "", true, http.StatusOK, posts)
+            return
+        }
+			http.ServeFile(w, r, "./index.html")
+	
+		}
+}
+
 func Logout(app *models.App) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, ok := r.Context().Value(contextKeyUser).(entities.UserData)

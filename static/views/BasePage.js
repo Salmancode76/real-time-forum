@@ -29,7 +29,7 @@ export class BasePage {
                     <li class="header">  <a href="/" onclick="navigateTo('/');">  Community Forum </a> </li>
                     <div class="nav-links">
                         <li> <a href="/" onclick="navigateTo('/');"> Posts</a></li>
-                        <li><a href="#">All users</a></li>
+                        <li><a href="#">Users</a></li>
                         <li><a href="#">Private Messages</a></li>
                       <!--  <li><a href="#">Welcome, Stranger</a></li> -->
                         <li><a href="/logout" onclick="navigateTo('/login');" id="logout_link">Logout</a></li>

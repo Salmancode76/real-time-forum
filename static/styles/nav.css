@@ -57,7 +57,7 @@ body {
 .nav-links a {
     color: #bdb9b8;
     text-decoration: none;
-    padding: 7px;
+    padding: 0.7em;
     border-radius: 10px;
     white-space: nowrap;  
 }

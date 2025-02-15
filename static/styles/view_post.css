@@ -1,0 +1,126 @@
+.post_title {
+  font-size: 2.5rem;
+  margin: 0.5em 0 0.5em;
+  color: #b5734c;
+  font-weight: bold;
+}
+
+.post_info {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin: 1em 0;
+  color: #bdb9b8;
+}
+
+#postview {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  background-color: #363636;
+  padding: 2em;
+  border-radius: 1em;
+  word-wrap: break-word;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: white;
+}
+
+.Viewcategory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin: 1em 0;
+}
+
+#viewPost {
+  display: flex;
+  justify-content: center;
+  margin-top: 4em;
+}
+
+#catgeory_viewpost {
+  display: flex;
+  align-items: center;
+  background-color: #b5734c;
+  color: white;
+  padding: 0.5em 1em;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.2s ease;
+}
+
+#catgeory_viewpost:hover {
+  background-color: #a56843;
+}
+
+.view_content {
+  margin-top: 2em;
+}  
+
+
+.post_comment{
+    display: flex;
+      width: 100%;
+        flex-direction: column;
+        justify-content: center;
+  align-items: center; 
+  margin: 3em;
+  margin-left: 0;
+  margin-right: 0;
+
+      
+}
+.submit_comment{
+    color: #b5734c;
+      font-weight: bold;
+
+    width: 70%;
+    padding: 1em;
+    background-color: #363636;
+    justify-items: flex-start;
+      border-radius: 20px;
+
+}
+.commentsection {
+    width: 100%;
+    padding: 0.8em;
+    border: 1px solid #bdb9b8;
+    border-radius: 10px;
+    background-color: #252525;
+    color: white;
+    min-height: 15dvh;
+}
+.commentBtn{
+    justify-content: center;
+    background-color: #b5734c;
+    width: 25%;
+    padding: 0.5em;
+    font-size: 1.3em;
+    color: white;
+    border-radius: 0.5em;
+    cursor: pointer;
+    margin-top: 0.5em;
+}
+@media (max-width: 768px) {
+  #postview {
+    width: 90%;
+    padding: 1em;
+  }
+
+  .post_title {
+    font-size: 2rem;
+  }
+
+  .post_info {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  .submit_comment{
+    width: 90%;
+  }
+}
+

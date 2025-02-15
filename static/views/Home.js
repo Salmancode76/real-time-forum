@@ -48,20 +48,23 @@ export class Home extends BasePage {
                   }</div>
               </div>
           <div class="category">
-        ${
-             post.categories
-                .map(
-                  (category) => `<div class="category-tag">${category}</div>`
-                )
-                .join(" ")
-        }
+        ${post.categories
+          .map((category) => `<div class="category-tag">${category}</div>`)
+          .join(" ")}
       </div>
 
               <div class="content">${
                 post.content?.replace(/\n/g, "<br>") || "No content available"
               }</div>
-              <a href="post.html?id=${post.id}" class="read_more">Read More</a>
-          </div>
+  
+  
+ 
+    <a href="/post?id=${post.id}" 
+                       onclick="event.preventDefault(); navigateTo('/post?id=${
+                         post.id
+                       }');" 
+                       class="read_more"> Read More</a>
+</div>
           `
               )
               .join("")
