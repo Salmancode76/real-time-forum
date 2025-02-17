@@ -12,6 +12,34 @@ import (
 
 var data map[string]interface{}
 
+func CreateComment (app * models.App) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		var comment entities.Comment
+		json.NewDecoder(r.Body).Decode(&comment)
+
+			sCookie, err := r.Cookie("session")
+		if err != nil {
+			http.Error(w, "Unable to retrieve session", http.StatusInternalServerError)
+			return
+		}
+
+		IDCookie, err := r.Cookie("userID")
+		if err != nil {
+			http.Error(w, "Unable to retrieve session", http.StatusInternalServerError)
+			return
+		}
+
+		if app.Session[IDCookie.Value]!=sCookie.Value{
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
+		return	
+		}
+		comment.UserID = IDCookie.Value
+
+
+		app.Posts.InsertComment(comment.UserID,comment.Comment,comment.Postid)
+	}
+}
+
 func ViewPost (app * models.App)http.HandlerFunc{
 		return func(w http.ResponseWriter, r *http.Request) {
 		var Post entities.Post
@@ -24,8 +52,15 @@ func ViewPost (app * models.App)http.HandlerFunc{
 			log.Println("Error :", err,Post)
 		}
 				
-		log.Print(Post)
-		
+	//	log.Print(Post)
+				var Comments []entities.Comment
+		Comments,err = app.Posts.GetPostComment(id)
+		if err!=nil{
+			log.Println(err)
+		}
+		Post.Comments = Comments
+		log.Println("Comments ",Comments)
+	
 	   if r.Header.Get("Accept") == "application/json" {
             posts := []entities.Post{Post}
             SendResponse(w, "Fetch Post", "", true, http.StatusOK, posts)
@@ -33,7 +68,11 @@ func ViewPost (app * models.App)http.HandlerFunc{
         }
 			http.ServeFile(w, r, "./index.html")
 	
+
+
+
 		}
+
 }
 
 func Logout(app *models.App) http.HandlerFunc{

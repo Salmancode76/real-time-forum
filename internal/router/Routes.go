@@ -33,6 +33,8 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("POST /createPost", handlers.CreatePost(app.App))
 
+	mux.HandleFunc("POST /createComment",handlers.CreateComment(app.App))
+
 	mux.HandleFunc("/", handlers.GetHome)
 
 	mux.HandleFunc("/api/posts",handlers.GetAllPosts(app.App))

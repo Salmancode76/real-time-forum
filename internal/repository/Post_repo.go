@@ -11,6 +11,38 @@ import (
 type PostModel struct {
 	DB *sql.DB
 }
+func (p * PostModel) GetPostComment(postID string)([]entities.Comment,error){
+	var Comments []entities.Comment
+	stmt :=`
+	SELECT id,
+       post_id,
+       user_id,
+       comment,
+       username,
+       created_at
+  FROM comments
+  Inner join  User  ON
+   User.UserID = user_id
+  where post_id = ?;
+`
+
+	rows,err := p.DB.Query(stmt,postID)
+
+	if err!=nil{
+		log.Println("Can't get comments")
+		return Comments,err
+	}
+	for rows.Next(){
+		var comment entities.Comment
+		err = rows.Scan(&comment.ID,&comment.Postid,&comment.UserID,&comment.Comment,&comment.Username,&comment.Date)
+		if err !=nil{
+		return Comments,err
+		}
+		Comments = append(Comments, comment)
+	}
+	return Comments,nil
+}
+
 func (p *PostModel) FindPost(id string) (entities.Post,error) {
 	var Post entities.Post
 	var temp_category string
@@ -60,26 +92,26 @@ func (p * PostModel) FetchAllPost()([]entities.Post,error){
 	var Posts []entities.Post
 	stmt :=`
 	
-		SELECT 
-    post.id,
-    post.title,
-    post.body,
-    post.created_at,
-    User.Username,
-    GROUP_CONCAT(category.name) AS categories
-FROM post
-INNER JOIN User
-    ON User.UserID = post.user_id
-INNER JOIN post_category
-    ON post_category.post_id = post.id
-INNER JOIN category
-    ON category.id = post_category.category_id
-GROUP BY 
-    post.id,
-    post.title,
-    post.body,
-    post.created_at,
-    User.Username;
+				SELECT 
+			post.id,
+			post.title,
+			post.body,
+			post.created_at,
+			User.Username,
+			GROUP_CONCAT(category.name) AS categories
+		FROM post
+		INNER JOIN User
+			ON User.UserID = post.user_id
+		INNER JOIN post_category
+			ON post_category.post_id = post.id
+		INNER JOIN category
+			ON category.id = post_category.category_id
+		GROUP BY 
+			post.id,
+			post.title,
+			post.body,
+			post.created_at,
+			User.Username;
   `
 
   row,err := p.DB.Query(stmt)
@@ -103,6 +135,29 @@ GROUP BY
 	}
 
 	return Posts,nil
+}
+func (p *PostModel) InsertComment (userID,comment,postID string)(error){
+	stmt:=`INSERT INTO comments (
+                         post_id,
+                         user_id,
+                         comment,
+                         created_at
+                     )
+                     VALUES (
+                     ?,
+                     ?,
+                     ?,
+                     datetime('now')
+                     );
+	`
+	_,err := p.DB.Exec(stmt,postID,userID,comment)
+
+	if err!=nil{
+		return fmt.Errorf("failed to insert Comment: %w", err)
+
+	}
+	return nil
+
 }
 
 func (p * PostModel) Insert(id,title,content string , categories[]string ) (error){

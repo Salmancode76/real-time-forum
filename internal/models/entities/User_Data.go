@@ -12,6 +12,15 @@ type UserData struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
+type Comment struct{
+	ID 		string
+	Postid string `json:"PostID"`
+	Comment string `json:"content"`
+	UserID string
+	Username string
+	Date       time.Time `json:"date"` 
+}
+
 
 
 type Post struct {
@@ -19,9 +28,10 @@ type Post struct {
     UserID     string    `json:"userId"`
     Title      string    `json:"title"`
     Content    string    `json:"content"`
-    Date       time.Time `json:"date"`  // Change to time.Time type
+    Date       time.Time `json:"date"`  
     Categories []string  `json:"categories"`
 	//Category string `json:"categorie"`
+	Comments 	[]Comment 
 }
 type Category struct{
 	Id string
