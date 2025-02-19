@@ -18,6 +18,8 @@ func GenerateSessionID() string {
 	return sessionID.String()
 }
 
+
+
 func Cookies(w http.ResponseWriter, userID string) string {
 	expiration := time.Now().Add(24 * time.Hour)
 	sessionID := GenerateSessionID()
@@ -28,7 +30,7 @@ func Cookies(w http.ResponseWriter, userID string) string {
 		Expires:  expiration,
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   false, // Set to true if using HTTPS
+		Secure:   false, 
 	}
 
 	userIDCookie := &http.Cookie{
@@ -37,7 +39,7 @@ func Cookies(w http.ResponseWriter, userID string) string {
 		Expires:  expiration,
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   false, // Set to true if using HTTPS
+		Secure:   false, 
 	}
 
 	http.SetCookie(w, sessionCookie)

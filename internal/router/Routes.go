@@ -35,7 +35,6 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("POST /createComment",handlers.CreateComment(app.App))
 
-	mux.HandleFunc("/", handlers.GetHome)
 
 	mux.HandleFunc("/api/posts",handlers.GetAllPosts(app.App))
 
@@ -44,6 +43,9 @@ func (app *GlobalApp) Routes() http.Handler {
 	mux.HandleFunc("/post",handlers.ViewPost(app.App))
 
 	mux.Handle("/auth-check", handlers.Authorized(app.App))
+
+	mux.HandleFunc("/",handlers.GetHome)
+
 
 	return handlers.MiddleWare(mux, app.App)
 }

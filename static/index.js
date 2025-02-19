@@ -81,7 +81,18 @@ export async function navigateTo(route) {
        
             
           default:
-            app.innerHTML = "404 Not found :(";
+          app.innerHTML = `
+            <div id="error_container">
+            <div id="Error_title">
+                404 
+            </div>
+
+            <div id="error_info">
+Sorry, the page you're looking for doesn't exist
+            </div>
+
+          </div>
+            `;
         }
 
         history.pushState(null, "", url.pathname + url.search);

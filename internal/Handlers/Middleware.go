@@ -59,18 +59,17 @@ func MiddleWare(next http.Handler, app *models.App) http.Handler {
 	})
 }
 
-func Authorized(app *models.App) http.HandlerFunc {
+func Authorized(app *models.App) (http.HandlerFunc) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
     user := r.Context().Value(contextKeyUser)
 	if user == nil {
 
 		w.WriteHeader(http.StatusSeeOther)
-
 		fmt.Println("Unauthorized")
 
 
-		return
+		return 
 
 	} else {
 		fmt.Println("Authorized")

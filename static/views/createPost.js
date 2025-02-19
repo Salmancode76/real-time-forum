@@ -61,15 +61,22 @@ export class CreatePost extends BasePage {
           
 
         }
+       
+       this.CheckAuth();
 
-        const response = await fetch("/createPost", {
+
+       await fetch("/createPost", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
+          credentials: "include",
           body : JSON.stringify(formData)
         });
+
+        window.location.reload();
+
 
         
       });

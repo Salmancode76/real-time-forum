@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	//"./db/db.db"
 	db, err := sql.Open("sqlite3", "./db/db.db")
 	if err != nil {
 		log.Fatal("Something bad happened while opening the database:", err)

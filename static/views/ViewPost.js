@@ -102,6 +102,7 @@ if (post.Comments.length > 0) {
         content: document.getElementById("commentsection").value,
       };
 
+      this.CheckAuth()
 
       fetch("/createComment", {
         method: "POST",

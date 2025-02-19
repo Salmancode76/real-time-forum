@@ -6,6 +6,14 @@ export class BasePage {
     app.innerHTML = this.Html;
   }
 
+  RedirectToLogin(){
+        alert(
+          "You are not logged in to view this page. Redirecting to login page..."
+        );
+         window.location.href = "/login";
+
+  
+}
   
 
    async CheckAuth(divName) {
@@ -13,11 +21,7 @@ export class BasePage {
       const response = await fetch("/auth-check");
 
       if (response.status === 303) {
-        alert(
-          "You are not logged in to view this page. Redirecting to login page..."
-        );
-         window.location.href = "/login";
-
+        this.RedirectToLogin()
         return;
       }
     
