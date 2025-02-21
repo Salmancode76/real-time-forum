@@ -5,8 +5,24 @@ export class ViewPost extends BasePage {
     super(ViewPost.getHtml());
     this.id = id;
     this.CheckAuth("app");
-    this.GetPost(); 
-    this.setUpForm();
+    this.initialize()
+    
+  }
+  async initialize(){
+    try{
+       await  this.GetPost(); 
+    await  this.setUpForm();
+    }catch(error){
+      if (error.status === 404){
+           document.getElementById("app").innerHTML = `
+                    <div id="error_container">
+                        <div id="Error_title">404</div>
+                        <div id="error_info">Sorry, the post you're looking for doesn't exist</div>
+                    </div>
+                `;
+           return;
+      }
+    }
   }
 
   async GetPost() {
@@ -15,10 +31,13 @@ export class ViewPost extends BasePage {
       headers: { Accept: "application/json" },
       cache: "no-store",
     });
+    console.log(response.status)
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+     if (!response.ok) {
+       const error = new Error(`HTTP error! status: ${response.status}`);
+       error.status = response.status;
+       throw error;
+     }
 
     const data = await response.json();
     console.table(data);
@@ -77,8 +96,10 @@ if (post.Comments.length > 0) {
             <span class="header">Comments</span>
             <br>
             <textarea name="commentsection" id="commentsection" required placeholder="Write your post comment here"></textarea>
+           <div class="commentBtnSec">
             <button class="commentBtn" type="submit">Submit</button>
-          </div>
+            </div>
+            </div>
         </div>
       </form>
     </div>

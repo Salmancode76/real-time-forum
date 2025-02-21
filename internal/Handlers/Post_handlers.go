@@ -105,11 +105,14 @@ func ViewPost (app * models.App)http.HandlerFunc{
 		id := r.URL.Query().Get("id")
 		log.Println(id)
 		Post,err :=app.Posts.FindPost(id)
-
-
 		if err!=nil{
-			http.Redirect(w,r,"/p",200)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+					Lost404(w,r)
+
+			 if r.Header.Get("Accept") == "application/json" {
+
+				SendResponse(w,"Finding Post","Not Found",false,http.StatusNotFound)
+			 }
+			return;
 		}
 				
 	//	log.Print(Post)

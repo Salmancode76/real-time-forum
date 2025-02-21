@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"real-time-forum/internal/models"
 	"real-time-forum/internal/models/entities"
 	"strconv"
@@ -12,9 +13,18 @@ import (
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
 
+	if _, err:=os.Stat("./index.html");os.IsNotExist(err){
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type","text/html")
+		w.Write([]byte(`500 Internal server error`))
+		return;
+	}
 	http.ServeFile(w, r, "./index.html")
+	
 
 }
+
+
 
 
 
@@ -113,4 +123,52 @@ func Logout(app *models.App) http.HandlerFunc{
 		
 
 	}
+}
+
+
+func Lost404(w http.ResponseWriter, r *http.Request){
+		w.WriteHeader(http.StatusNotFound)
+			w.Header().Set("Content-Type","text/html")
+			
+			w.Write([]byte(`
+			<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<link rel="stylesheet" href="/static/styles/sign_up.css">
+				<link rel="stylesheet" href="/static/styles/login.css"> 
+				<link rel="stylesheet" href="/static/styles/nav.css"> 
+				<link rel="stylesheet" href="/static/styles/create_post.css">
+				<link rel="stylesheet" href="/static/styles/home.css">
+				<link rel="stylesheet" href="/static/styles/view_post.css">
+				<link rel="stylesheet" href="/static/styles/errors.css">
+
+
+
+				<title>Community Forum</title>
+			</head>
+			<body>
+				<nav id="nav">
+					<ul>
+						<li class="header">  <a href="/" onclick="navigateTo('/');">  Community Forum </a> </li>
+						<div class="nav-links">
+							<li><a <a href="/sign" onclick="navigateTo('/sign');"> Sign-Up</a></li>
+							<li><a <a href="/login" onclick="navigateTo('/login');"> Login</a></li>
+
+						</div>
+						<img id="hamICON" src="/static/images/ham_menu.svg" alt="Menu">
+					</ul>
+				</nav>
+				<div id="app">
+				 
+        	  </div>
+				</div>
+				<script type="module" src="./static/index.js"></script>
+			</body>
+			</html>
+						
+			
+			
+			`))
 }

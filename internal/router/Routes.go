@@ -44,7 +44,14 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.Handle("/auth-check", handlers.Authorized(app.App))
 
-	mux.HandleFunc("/",handlers.GetHome)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/"{	
+		handlers.Lost404(w,r)
+	
+		}else{
+			handlers.GetHome(w,r)
+		}
+	})
 
 
 	return handlers.MiddleWare(mux, app.App)

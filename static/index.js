@@ -50,6 +50,8 @@ export async function navigateTo(route) {
 
  
     try {
+      
+        
         switch (path) {
           case "/":
             new Home();
@@ -71,6 +73,7 @@ export async function navigateTo(route) {
             break;
          case "/post":
             const id = url.searchParams.get("id");
+            
           if (id) {
             await new ViewPost(id);
           } else {
@@ -81,6 +84,7 @@ export async function navigateTo(route) {
        
             
           default:
+          
           app.innerHTML = `
             <div id="error_container">
             <div id="Error_title">
@@ -97,7 +101,23 @@ Sorry, the page you're looking for doesn't exist
 
         history.pushState(null, "", url.pathname + url.search);
     } catch (error) {
-        app.innerHTML = "500" + error;
+      
+          app.innerHTML = `
+            <div id="error_container">
+            <div id="Error_title">
+                500 
+            </div>
+
+            <div id="error_info">
+
+            Internal server error ${error}
+            </div>
+
+          </div>
+            `;
+  console.error("500 Internal Server Error: ", error);
+
+      
     }
 }
 

@@ -27,8 +27,12 @@ export class login extends BasePage{
     setupFormSubmission(){
         const form = document.getElementById('loginForm');
         if (!form) {
-            console.error("Form not found!");
-            return;
+                 console.error("Form not found!");
+                 const error = new Error(
+                   `HTTP error! status: ${response.status}`
+                 );
+                 error.status = 500;
+                 throw error;
         }
         form.addEventListener('submit' , async (e)=>{
             e.preventDefault();
@@ -59,11 +63,11 @@ export class login extends BasePage{
                                         navigateTo('/');
                                     }, 2000);
             }
-            alert('Response from server: ' + JSON.stringify(data));
+           // alert('Response from server: ' + JSON.stringify(data));
 
         }catch(error){
             console.error("Form submission failed:", error);
-            alert("Form submission failed. Please try again.");
+            throw error
         }
         })
     }

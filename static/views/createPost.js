@@ -42,7 +42,9 @@ export class CreatePost extends BasePage {
     const form = document.getElementById("PostForm");
       if (!form) {
         console.error("Form not found!");
-        return;
+       const error = new Error(`HTTP error! status: ${response.status}`);
+        error.status = 500
+        throw error;
       }
 
 
