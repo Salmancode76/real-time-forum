@@ -11,7 +11,7 @@ export class ViewPost extends BasePage {
   async initialize(){
     try{
        await  this.GetPost(); 
-    await  this.setUpForm();
+    await  this.SetUpCommentForm();
     }catch(error){
       if (error.status === 404){
            document.getElementById("app").innerHTML = `
@@ -109,7 +109,7 @@ if (post.Comments.length > 0) {
     `;
   }
 
-  async setUpForm() {
+  async SetUpCommentForm() {
     const form = document.getElementById("CommentForm");
     if (!form) {
       console.error("Form not found!");
@@ -118,10 +118,16 @@ if (post.Comments.length > 0) {
 
     form.addEventListener("submit", (e) => {
       e.preventDefault(); 
+      
       const Comment = {
         PostID: this.id,
-        content: document.getElementById("commentsection").value,
+        content: document.getElementById("commentsection").value.trim(),
       };
+
+      if (Comment.content === ""){
+        alert("YOUR COMMENT CAN'T BE EMPTY")
+        return;
+      }
 
       this.CheckAuth()
 

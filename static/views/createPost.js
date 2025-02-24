@@ -63,6 +63,10 @@ export class CreatePost extends BasePage {
           
 
         }
+        if (formData.title === "" || formData.content === ""){
+          alert("Title or Body of the post can't be empty!!!!")
+          return;
+        }
        
        this.CheckAuth();
 

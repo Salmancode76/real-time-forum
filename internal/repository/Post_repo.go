@@ -11,6 +11,101 @@ import (
 type PostModel struct {
 	DB *sql.DB
 }
+
+func (p * PostModel) GetPostByUserID(userID string) ([]entities.Post, error){
+	var Posts []entities.Post
+
+	stmt :=`
+			SELECT 
+			p.id,
+			p.title,
+			p.body,
+			p.created_at,
+			Username,
+			GROUP_CONCAT(c.name, ', ') AS category_names
+		FROM post p
+		INNER JOIN post_category pc ON p.id = pc.post_id
+		INNER JOIN category c ON pc.category_id = c.id
+		INNER JOIN User u on u.UserID = p.user_id
+		where p.user_id = ?
+		GROUP BY p.id;
+	`
+
+	rows,err:= p.DB.Query(stmt,userID)
+
+	if err!= nil{
+		log.Println("No Post found :",err)
+		return Posts,err
+	}
+
+	for rows.Next(){
+		var Post entities.Post
+		var temp_category string
+		rows.Scan(&Post.ID,&Post.Title,&Post.Content,&Post.Date,&Post.UserID,&temp_category)
+
+		 cat := strings.Split((temp_category), ",")
+	
+		Post.Categories = cat
+
+		Posts = append(Posts, Post)
+		
+	}
+
+	return Posts,nil
+
+}
+
+func (p *PostModel) GetPostsByCategory(Category string)([]entities.Post, error){
+
+	var Posts []entities.Post
+		stmt :=`
+		
+		SELECT 
+			p.id,
+			p.title,
+			p.body,
+			p.created_at,
+			Username,
+			GROUP_CONCAT(c.name, ', ') AS category_names
+		FROM post p
+		INNER JOIN post_category pc ON p.id = pc.post_id
+		INNER JOIN category c ON pc.category_id = c.id
+		INNER JOIN User u on UserID = p.user_id
+		WHERE p.id IN (
+			SELECT DISTINCT pc1.post_id 
+			FROM post_category pc1
+			INNER JOIN category c1 ON pc1.category_id = c1.id
+			WHERE c1.name = ?
+		)
+		GROUP BY p.id
+		HAVING category_names LIKE '%' || ? || '%';
+
+
+		
+			`
+	rows,err:= p.DB.Query(stmt,Category,Category)
+
+		if err!=nil{
+		log.Println("Can't get posts")
+		return Posts,err
+	}
+
+	for rows.Next(){
+			var Post entities.Post
+		var temp_category string
+		rows.Scan(&Post.ID,&Post.Title,&Post.Content,&Post.Date,&Post.UserID,&temp_category)
+
+		 cat := strings.Split((temp_category), ",")
+	
+		Post.Categories = cat
+
+		Posts = append(Posts, Post)
+		
+	}
+	return Posts,nil
+
+}
+
 func (p * PostModel) GetPostComment(postID string)([]entities.Comment,error){
 	var Comments []entities.Comment
 	stmt :=`

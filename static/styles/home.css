@@ -6,6 +6,25 @@ body {
     padding: 0;
 }
 
+.filter_container{
+    display: flex;
+    max-height: 20dvh;
+    width: 98%;
+    background-color: #3a3a3a;
+    padding: 1em;
+    border-radius: 10px;
+    margin-bottom: 1em;
+    flex-direction: column;
+           font-weight: bolder;
+
+    font-size: 3dvh;
+}
+
+.select_bar{
+        font-size: 3dvh;
+    margin-top: 1em;
+    width: 100%;
+}
 #home {
     padding: 2em;
     background-color: #1A1A1A;
@@ -134,7 +153,9 @@ body {
 
 }
 
-
+#match{
+    background-color:#7f4f29;
+}
 @media (max-width: 768px) {
     #home {
         padding: 1em;

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/internal/models"
@@ -9,6 +10,63 @@ import (
 )
 
 var data map[string]interface{}
+
+func FetchCategory(app * models.App) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		var Category entities.Category
+		err := json.NewDecoder(r.Body).Decode(&Category)
+
+
+
+		if err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			fmt.Println("Error decoding JSON:", err)
+			return
+		}
+		var Posts []entities.Post
+		if(Category.Name == "My Posts"){
+			sCookie, err := r.Cookie("session")
+			if err != nil {
+				http.Error(w, "Unable to retrieve Cookie", http.StatusUnauthorized)
+				SendResponse(w, "Valdate Cooke","Unable to retrieve Cookie",false, http.StatusUnauthorized)
+
+				return
+			}
+
+			IDCookie, err := r.Cookie("userID")
+			if err != nil {
+				http.Error(w, "Unable to retrieve Cookie", http.StatusUnauthorized)
+			SendResponse(w, "Valdate Cooke","Unable to retrieve Cookie",false, http.StatusUnauthorized)
+
+				return
+			}
+
+			if app.Session[IDCookie.Value] != sCookie.Value {
+				http.Error(w, "User not logged in", http.StatusUnauthorized)
+				SendResponse(w, "Valdate Cooke","User not logged in",false, http.StatusUnauthorized)
+
+				return
+			}
+
+			if app.Session[IDCookie.Value]!=sCookie.Value{
+			http.Error(w, "User not logged in", http.StatusUnauthorized)
+			return	
+			}
+
+			Posts,err = app.Posts.GetPostByUserID(IDCookie.Value)
+			fmt.Println(Posts)
+		}else{
+		Posts,err =app.Posts.GetPostsByCategory(Category.Name)
+
+		}
+		if err!=nil{
+			log.Println(err)
+		}
+
+	
+		SendResponse(w,"Fetching Post by Category","",true,http.StatusOK,Posts)
+	}
+}
 
 func CreateComment (app * models.App) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
