@@ -8,7 +8,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-
 func GenerateSessionID() string {
 	sessionID, err := uuid.NewV4()
 	if err != nil {
@@ -17,8 +16,6 @@ func GenerateSessionID() string {
 
 	return sessionID.String()
 }
-
-
 
 func Cookies(w http.ResponseWriter, userID string) string {
 	expiration := time.Now().Add(24 * time.Hour)
@@ -30,7 +27,7 @@ func Cookies(w http.ResponseWriter, userID string) string {
 		Expires:  expiration,
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   false, 
+		Secure:   false,
 	}
 
 	userIDCookie := &http.Cookie{
@@ -39,7 +36,7 @@ func Cookies(w http.ResponseWriter, userID string) string {
 		Expires:  expiration,
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   false, 
+		Secure:   false,
 	}
 
 	http.SetCookie(w, sessionCookie)

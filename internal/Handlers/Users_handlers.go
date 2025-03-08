@@ -24,7 +24,11 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
+func Chat(app *models.App) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) { 
+	fmt.Print("chat started")
+	return
+}}
 
 
 

@@ -1,4 +1,4 @@
-import { initWebSocket, sendMessage } from "./WebSocket.js";
+import { initWebSocket, sendMessage } from "./salmanWebSocket.js";
 import { BasePage } from "./BasePage.js";
 
 export class Home extends BasePage {

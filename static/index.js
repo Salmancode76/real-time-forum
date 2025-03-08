@@ -4,6 +4,7 @@ import { s_test } from "./views/s_testing.js";
 import { login } from "./views/login.js";
 import { CreatePost } from "./views/createPost.js";
 import { ViewPost} from "./views/ViewPost.js"
+import { Chat } from './views/chat.js';
 
 handleInitialLoad();
 
@@ -67,6 +68,9 @@ export async function navigateTo(route) {
             break;
           case "/logout":
             new login();
+            break;
+            case "/chat":
+            new Chat();
             break;
           case "/createPost":
             new CreatePost();
