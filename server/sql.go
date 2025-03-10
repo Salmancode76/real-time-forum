@@ -11,7 +11,7 @@ import (
 
 // Open the database
 func OpenDatabase() *sql.DB {
-	db, err := sql.Open("sqlite3", "DB/mydb.db")
+	db, err := sql.Open("sqlite3", "db/db.db")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return nil
@@ -77,7 +77,7 @@ func GetChatHistory(user string, from string, offset int) []Message {
 // Get username depending on userID
 func GetUsernameFromId(db *sql.DB, id string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
-	query := "SELECT name FROM users WHERE id = ?"
+	query := "SELECT name FROM User WHERE UserID = ?"
 
 	// Execute the query and retrieve the user ID
 	var username string
@@ -91,7 +91,7 @@ func GetUsernameFromId(db *sql.DB, id string) string {
 
 func GetUserID(db *sql.DB, username string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
-	query := "SELECT id FROM users WHERE name = ?"
+	query := "SELECT id FROM User WHERE Ueername = ?"
 
 	// Execute the query and retrieve the user ID
 	var userID string
@@ -104,7 +104,7 @@ func GetUserID(db *sql.DB, username string) string {
 }
 
 func getAllUsers(db *sql.DB) []string {
-	query := "SELECT name FROM users"
+	query := "SELECT Username FROM User"
 	var names []string
 	rows, err := db.Query(query)
 	if err != nil {

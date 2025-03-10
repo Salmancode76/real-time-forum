@@ -184,7 +184,6 @@ type ServerComment struct {
 	IsEdited       bool      `json:"isedited"`
 }
 
-
-type AllUsers struct{
+type AllUsers struct {
 	Username string `json:"username"`
 }
