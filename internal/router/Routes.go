@@ -2,7 +2,7 @@ package router
 
 import (
 	"net/http"
-	"real-time-forum/internal/handlers"
+	handlers "real-time-forum/internal/Handlers"
 	"real-time-forum/internal/models"
 )
 
@@ -19,6 +19,10 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("/ws", handlers.HandleWebSocket)
 
+	mux.HandleFunc("GET /chat", handlers.GetHome)
+
+	mux.HandleFunc("Post /chat", handlers.Chat(app.App))
+
 	mux.HandleFunc("/s", handlers.S_test)
 
 	mux.HandleFunc("GET /sign", handlers.GetHome)
@@ -33,28 +37,26 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("POST /createPost", handlers.CreatePost(app.App))
 
-	mux.HandleFunc("POST /createComment",handlers.CreateComment(app.App))
+	mux.HandleFunc("POST /createComment", handlers.CreateComment(app.App))
 
+	mux.HandleFunc("/api/posts", handlers.GetAllPosts(app.App))
 
-	mux.HandleFunc("/api/posts",handlers.GetAllPosts(app.App))
+	mux.HandleFunc("/logout", handlers.Logout(app.App))
 
-	mux.HandleFunc("/logout",handlers.Logout(app.App))
-
-	mux.HandleFunc("/post",handlers.ViewPost(app.App))
+	mux.HandleFunc("/post", handlers.ViewPost(app.App))
 
 	mux.Handle("/auth-check", handlers.Authorized(app.App))
 
-	mux.Handle("/fetchPost",handlers.FetchCategory(app.App))
+	mux.Handle("/fetchPost", handlers.FetchCategory(app.App))
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/"{	
-		handlers.Lost404(w,r)
-	
-		}else{
-			handlers.GetHome(w,r)
+		if r.URL.Path != "/" {
+			handlers.Lost404(w, r)
+
+		} else {
+			handlers.GetHome(w, r)
 		}
 	})
-
 
 	return handlers.MiddleWare(mux, app.App)
 }
