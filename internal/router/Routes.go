@@ -19,7 +19,7 @@ func (app *GlobalApp) Routes() http.Handler {
 
 	mux.HandleFunc("/ws", handlers.HandleWebSocket)
 
-	mux.HandleFunc("/chat", handlers.Chat(app.App))
+	mux.HandleFunc("GET /chat", handlers.Chat(app.App))
 
 	mux.HandleFunc("/s", handlers.S_test)
 

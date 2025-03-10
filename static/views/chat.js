@@ -4,12 +4,13 @@ import { BasePage } from "./BasePage.js";
 export class Chat extends BasePage {
   constructor() {
     super(Chat.getHtml());
-   //this.CheckAuth();
+   this.CheckAuth("home_main");
   }
 
   static getHtml() {
     return `
-      <div class="container">
+  
+      <div class="container" >
         <div class="column" id="DM">
           <h2>Column 1</h2>
           <p>Some text for the first column. This can be any HTML content.</p>
