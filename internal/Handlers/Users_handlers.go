@@ -13,24 +13,21 @@ import (
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
 
-	if _, err:=os.Stat("./index.html");os.IsNotExist(err){
+	if _, err := os.Stat("./index.html"); os.IsNotExist(err) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type","text/html")
+		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(`500 Internal server error`))
-		return;
+		return
 	}
 	http.ServeFile(w, r, "./index.html")
-	
 
 }
 
 func Chat(app *models.App) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) { 
-	fmt.Print("chat started")
-	return
-}}
-
-
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Print("chat started")
+	}
+}
 
 // PostSign is the handler for the POS
 func PostSign(app *models.App) http.HandlerFunc {
@@ -109,32 +106,30 @@ func PostLogin(app *models.App) http.HandlerFunc {
 	}
 }
 
-func Logout(app *models.App) http.HandlerFunc{
+func Logout(app *models.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, ok := r.Context().Value(contextKeyUser).(entities.UserData)
 
 		fmt.Println(user)
-		if !ok{
-			http.Redirect(w,r,"/login",http.StatusSeeOther)
+		if !ok {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
 		tempID := strconv.Itoa(user.UserID)
 
-		delete(app.Session,tempID)
-		delete(app.UserID,user.Username)
-		 w.WriteHeader(http.StatusNoContent) 
-		
+		delete(app.Session, tempID)
+		delete(app.UserID, user.Username)
+		w.WriteHeader(http.StatusNoContent)
 
 	}
 }
 
+func Lost404(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Header().Set("Content-Type", "text/html")
 
-func Lost404(w http.ResponseWriter, r *http.Request){
-		w.WriteHeader(http.StatusNotFound)
-			w.Header().Set("Content-Type","text/html")
-			
-			w.Write([]byte(`
+	w.Write([]byte(`
 			<!DOCTYPE html>
 			<html lang="en">
 			<head>

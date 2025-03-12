@@ -57,6 +57,9 @@ export async function navigateTo(route) {
           case "/":
             new Home();
             break;
+          case "/chat":
+           new Chat();
+            break;
           case "/s":
             await new s_test();
             break;
@@ -68,9 +71,6 @@ export async function navigateTo(route) {
             break;
           case "/logout":
             new login();
-            break;
-            case "/chat":
-            new Chat();
             break;
           case "/createPost":
             new CreatePost();

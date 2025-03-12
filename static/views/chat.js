@@ -4,7 +4,7 @@ import { BasePage } from "./BasePage.js";
 export class Chat extends BasePage {
   constructor() {
     super(Chat.getHtml());
-   //this.CheckAuth();
+   this.CheckAuth();
   }
 
   static getHtml() {
