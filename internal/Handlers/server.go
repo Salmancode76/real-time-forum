@@ -1,8 +1,12 @@
 package handlers
 
 import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -65,5 +69,57 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Write failed: %v", err)
 			return
 		}
+
+		var myMessage MyMessage
+		json.Unmarshal(message, &myMessage)
+		//fmt.Println(myMessage)
+		handleWebSocketMessage(conn, myMessage)
+
 	}
+}
+
+func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
+	//fmt.Println("Message received: ", message.Type)
+
+	switch message.Type {
+	case "message":
+		handleMessageMessage(conn, message)
+	case "get_users":
+		fmt.Println("will get users now=======>>>>>")
+		handleGetUsersMessage(conn)
+	case "get_chat_history":
+		//	handleGetChatHistoryMessage(conn, message)
+
+	}
+}
+
+func OpenDatabase() *sql.DB {
+	db, err := sql.Open("sqlite3", "db/db.db")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return nil
+	}
+	return db
+}
+
+func handleGetUsersMessage(conn *websocket.Conn) {
+	db := OpenDatabase()
+	defer db.Close()
+	users := getAllUsers(db)
+	//fmt.Println(users)
+	var allUsers []ServerUser
+	for _, i := range users {
+		allUsers = append(allUsers, ServerUser{Name: i})
+	}
+	message := ServerMessage{Type: "users", Users: allUsers}
+	conn.WriteJSON(message)
+	//fmt.Println(message)
+}
+func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
+	db := OpenDatabase()
+	defer db.Close()
+	To := message.To
+	From := GetUserID(db, message.From)
+	fmt.Println(message.Text)
+	AddMessageToHistory(From, To, message.Text)
 }

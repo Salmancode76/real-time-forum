@@ -31,12 +31,12 @@ func Cookies(w http.ResponseWriter, userID string) string {
 	}
 
 	userIDCookie := &http.Cookie{
-		Name:     "userID",
-		Value:    userID,
-		Expires:  expiration,
-		HttpOnly: true,
-		Path:     "/",
-		Secure:   false,
+		Name:    "userID",
+		Value:   userID,
+		Expires: expiration,
+		//HttpOnly: true,
+		Path:   "/",
+		Secure: false,
 	}
 
 	http.SetCookie(w, sessionCookie)

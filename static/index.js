@@ -5,6 +5,7 @@ import { login } from "./views/login.js";
 import { CreatePost } from "./views/createPost.js";
 import { ViewPost} from "./views/ViewPost.js"
 import { Chat } from './views/chat.js';
+import * as main from './views/main.js'
 
 handleInitialLoad();
 
@@ -59,6 +60,8 @@ export async function navigateTo(route) {
             break;
           case "/chat":
            new Chat();
+           console.log("chat will start")
+          main.usersLoadfunc()
             break;
           case "/s":
             await new s_test();

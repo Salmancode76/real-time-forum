@@ -1,4 +1,4 @@
-export const socket = new WebSocket("ws://localhost:8082/ws");
+export const socket = new WebSocket("ws://localhost:8080/ws");
 
 
 

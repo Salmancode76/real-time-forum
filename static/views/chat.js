@@ -1,5 +1,9 @@
 import { BasePage } from "./BasePage.js";
+import {socket} from './socket.js'
+import * as session from './Session.js'
 
+let currentChatUser = null;
+let currentUser = session.testCookie()
 
 export class Chat extends BasePage {
   constructor() {
@@ -37,4 +41,84 @@ export class Chat extends BasePage {
   }
 
 
+}
+export function loadUsers(){
+  
+
+  console.log("connecting to users====>")
+  socket.send(JSON.stringify({"type": "get_users"}));
+}
+
+
+export function showUsers(msg){
+  // const data = JSON.parse(msg);
+   //console.log(msg)
+     let data =msg
+     // update the div with the list of users
+     const usersDiv = document.getElementById("user-list");
+     usersDiv.innerHTML = "";
+     const sorted = sort(data.users)
+     for (const user of sorted) {
+       const userContainer = document.createElement("div");
+         userContainer.className = "user-container";
+         userContainer.id = "user-" + user.name;
+ 
+         const greenCircle = document.createElement("span");
+         //to be changed to red
+         greenCircle.style.backgroundColor = "red";
+         greenCircle.style.width = "10px";
+         greenCircle.style.height = "10px";
+         greenCircle.style.borderRadius = "50%";
+         greenCircle.style.display = "inline-block";
+         greenCircle.style.marginRight = "10px";
+         greenCircle.style.marginLeft = "10px";
+         userContainer.appendChild(greenCircle);
+ 
+         const usernameElem = document.createElement("span");
+         usernameElem.className = "username";
+         usernameElem.textContent = user.name;
+         userContainer.appendChild(usernameElem);
+ 
+         // If the user has a last message, display it in the user list (this is the last message they sent or received)
+         if (currentChatUser === null || currentChatUser.id !== user.id) {
+           const bubbleGif = document.createElement("img");
+          // bubbleGif.src = "/style/bubble.gif";
+           bubbleGif.className = "bubble";
+           bubbleGif.style.marginLeft = "10px";
+           bubbleGif.setAttribute("data-recipient", user.name);
+           //console.log("Added recipient ID: " + user.username)
+           userContainer.appendChild(bubbleGif);
+         }
+ 
+         userContainer.addEventListener("click", () => {
+           //getHistoy()
+           socket.send(JSON.stringify({"type": "get_chat_history","from":user.name,"to":currentUser}));
+           console.log("Clicked on user: " + user.name);
+           currentChatUser = user;
+         });
+ 
+         usersDiv.appendChild(userContainer);
+        
+     }
+   
+ }
+
+
+ function sort(arr) {
+  if (!Array.isArray(arr)) {
+    return "Input is not an array.";
+  }
+
+  return arr.slice().sort((a, b) => {
+    const nameA = a.name ? a.name.toLowerCase() : ""; // Handle potential missing or undefined names
+    const nameB = b.name ? b.name.toLowerCase() : "";
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0; // Names are equal
+  });
 }
