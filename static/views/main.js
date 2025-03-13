@@ -26,7 +26,7 @@ const msg = JSON.parse(e.data)
         break
         case "oldmessages":
         Chat.oldmessagesofserv(msg.chathistory)
-       // console.log(msg.chathistory)
+        console.log(msg.chathistory)
         break
         case "chat":
         Chat.receiveChatMsg(msg)

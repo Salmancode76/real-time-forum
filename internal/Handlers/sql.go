@@ -33,6 +33,7 @@ func GetChatHistory(user string, from string, offset int) []Message {
 	defer db.Close()
 
 	rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY time ASC LIMIT 10 OFFSET ?", user, from, from, user, offset)
+	//rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages ")
 
 	if err != nil {
 		fmt.Printf("Server >> Error getting chat history: %s", err)
@@ -68,7 +69,7 @@ func GetChatHistory(user string, from string, offset int) []Message {
 // Get username depending on userID
 func GetUsernameFromId(db *sql.DB, id string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
-	query := "SELECT name FROM User WHERE UserID = ?"
+	query := "SELECT Username FROM User WHERE UserID = ?"
 
 	// Execute the query and retrieve the user ID
 	var username string
@@ -82,7 +83,7 @@ func GetUsernameFromId(db *sql.DB, id string) string {
 
 func GetUserID(db *sql.DB, username string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
-	query := "SELECT id FROM User WHERE Ueername = ?"
+	query := "SELECT UserID FROM User WHERE Username = ?"
 
 	// Execute the query and retrieve the user ID
 	var userID string

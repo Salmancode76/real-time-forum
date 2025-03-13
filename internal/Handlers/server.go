@@ -88,7 +88,7 @@ func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
 		fmt.Println("will get users now=======>>>>>")
 		handleGetUsersMessage(conn)
 	case "get_chat_history":
-		//	handleGetChatHistoryMessage(conn, message)
+		handleGetChatHistoryMessage(conn, message)
 
 	}
 }
@@ -122,4 +122,20 @@ func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	From := GetUserID(db, message.From)
 	fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
+}
+
+func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
+	db := OpenDatabase()
+	defer db.Close()
+
+	To := m.To
+	From := GetUserID(db, m.From)
+	fmt.Println(To)
+	fmt.Println(From)
+	messages := GetChatHistory(To, From, 0)
+
+	message := ServerMessage{Type: "oldmessages", ChatHistory: messages}
+	conn.WriteJSON(message)
+	fmt.Println(message)
+
 }

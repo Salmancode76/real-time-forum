@@ -43,12 +43,14 @@ body, html {
 }
 
 #message-container div {
-  background-color: #CCC;
+  background-color: #333; /* Dark gray background */
+  color: #EEE; /* Light gray text for contrast */
   padding: 5px;
+  border-bottom: 1px solid #444; /* Subtle divider between messages */
 }
 
 #message-container div:nth-child(2n) {
-  background-color: #FFF;
+  background-color: #444; /* Slightly lighter dark gray for alternating rows */
 }
 
 #send-container {
