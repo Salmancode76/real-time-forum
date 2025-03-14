@@ -126,7 +126,7 @@ export function showUsers(msg){
 export function oldmessagesofserv(data){
   
   DM();
-  showMessages(data,"hamad.ar",currentChatUser.name);
+  showMessages(data,currentUser,currentChatUser.name);
 }
 
 function DM(){
@@ -174,7 +174,7 @@ messagesDiv.innerHTML = '';
          "From":from,
          "To":to,
         "Text":message}));
-      console.log("it shouldnet reload")
+      //.log("it shouldnet reload")
       // Optionally clear the input field
       messageInput.value = '';
 

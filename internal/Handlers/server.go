@@ -118,8 +118,9 @@ func handleGetUsersMessage(conn *websocket.Conn) {
 func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	db := OpenDatabase()
 	defer db.Close()
-	To := message.To
-	From := GetUserID(db, message.From)
+	
+	From := message.From
+	To := GetUserID(db, message.To)
 	fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
 }
