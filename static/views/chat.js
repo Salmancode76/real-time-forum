@@ -149,37 +149,45 @@ let template = `<div id="message-container">
 }
 
 
-
 //build messages 
 function showMessages(data,from,to) {
 console.log(data)
 let messagesDiv = document.getElementById("messages");
 messagesDiv.innerHTML = '';
 
-    for (let i = 0; i < data.length; ++i) {
-
-        messagesDiv.appendChild(buildMessageDiv(data[i]));
-    }
+for (let i = data.length - 1; i >= 0; --i) {
+  messagesDiv.appendChild(buildMessageDiv(data[i]));
+}
  
     const form = document.getElementById('send-container');
     const messageInput = document.getElementById('message-input');
     
     form.addEventListener('submit', function(event) {
-      event.preventDefault(); // Prevent page refresh
-      
+      event.preventDefault();
+
       const message = messageInput.value;
       console.log('Message:', message);
-        socket.send(JSON.stringify({
-         "type": "message",
-         "From":from,
-         "To":to,
-        "Text":message}));
-      //.log("it shouldnet reload")
-      // Optionally clear the input field
+      socket.send(JSON.stringify({
+          "type": "message",
+          "From": from,
+          "To": to,
+          "Text": message
+      }));
       messageInput.value = '';
 
-    });
+      const now = new Date();
+      const formattedTime = formatTime(now);
 
+      // Create a div element for the message
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message'); // add class for styling
+
+      // Set the text content of the div
+      messageDiv.textContent = from + " (" + formattedTime + "): " + message;
+
+      // Append the div to the messagesDiv
+      messagesDiv.appendChild(messageDiv);
+  });
     
 }
 
@@ -191,5 +199,20 @@ div.classList = 'message';
 div.innerText = msgData.from + " (" + msgData.createdat + "): " + msgData.text;
 return div;
 }
+
+
+function formatTime(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+
+
 
 

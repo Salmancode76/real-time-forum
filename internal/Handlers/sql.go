@@ -32,7 +32,7 @@ func GetChatHistory(user string, from string, offset int) []Message {
 	db := OpenDatabase()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY time ASC LIMIT 10 OFFSET ?", user, from, from, user, offset)
+	rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY time DESC LIMIT 10 OFFSET ?", user, from, from, user, offset)
 	//rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages ")
 
 	if err != nil {
