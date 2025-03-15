@@ -4,6 +4,7 @@ import * as session from './Session.js'
 
 let currentChatUser = null;
 let currentUser = session.testCookie()
+let currentname=null
 
 export class Chat extends BasePage {
   constructor() {
@@ -199,7 +200,7 @@ for (let i = data.length - 1; i >= 0; --i) {
       messageDiv.classList.add('message'); // add class for styling
 
       // Set the text content of the div
-      messageDiv.textContent = from + " (" + formattedTime + "): " + message;
+      messageDiv.textContent = currentname+ " (" + formattedTime + "): " + message;
 
       // Append the div to the messagesDiv
       messagesDiv.appendChild(messageDiv);
@@ -213,6 +214,7 @@ function buildMessageDiv(msgData) {
 let div = document.createElement('div');
 div.classList = 'message';
 div.innerText = msgData.from + " (" + msgData.createdat + "): " + msgData.text;
+currentname=msgData.from
 return div;
 }
 
