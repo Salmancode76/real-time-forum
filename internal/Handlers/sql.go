@@ -81,6 +81,20 @@ func GetUsernameFromId(db *sql.DB, id string) string {
 	return username
 }
 
+
+func GetUserName(db *sql.DB,From string)string{
+	query := "SELECT Username FROM User WHERE UserID = ?"
+
+	// Execute the query and retrieve the user ID
+	var username string
+	err := db.QueryRow(query, From).Scan(&username)
+	if err != nil {
+		fmt.Printf("Server >> Error getting user ID: %s", err)
+	}
+
+	return username
+}
+
 func GetUserID(db *sql.DB, username string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
 	query := "SELECT UserID FROM User WHERE Username = ?"

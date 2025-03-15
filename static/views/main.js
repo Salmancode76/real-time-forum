@@ -37,6 +37,8 @@ const msg = JSON.parse(e.data)
         case "comment":
         Post.receiveCommentMsg(msg)
         break
+        case "PM":
+        Chat.PM(msg)
         default:
         console.log("Msg type not supported : " + msg.type)
         break

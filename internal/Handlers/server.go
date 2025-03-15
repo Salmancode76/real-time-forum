@@ -7,11 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"real-time-forum/internal/models"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
-
+var userSockets = make(map[string]*websocket.Conn)
+// var clients = make(map[*websocket.Conn]*Session)
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -20,14 +22,19 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
+	
+	cookie, err := r.Cookie("userID")
+	fmt.Println("cookie name =",cookie.Name)
+	fmt.Println("cookie value =",cookie.Value)
+	
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("WebSocket upgrade failed: %v", err)
 		return
 	}
 	defer conn.Close()
-
+	userSockets[cookie.Value]=conn
 	// Configure ping/pong handlers
 	conn.SetPingHandler(func(string) error {
 		log.Println("Received ping, sending pong")
@@ -73,6 +80,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		var myMessage MyMessage
 		json.Unmarshal(message, &myMessage)
 		//fmt.Println(myMessage)
+		// cookieValue := r.Header.Get("Cookie")
+		// handleWebSocketConnection(conn, cookieValue)
 		handleWebSocketMessage(conn, myMessage)
 
 	}
@@ -84,6 +93,7 @@ func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
 	switch message.Type {
 	case "message":
 		handleMessageMessage(conn, message)
+
 	case "get_users":
 		fmt.Println("will get users now=======>>>>>")
 		handleGetUsersMessage(conn)
@@ -118,11 +128,21 @@ func handleGetUsersMessage(conn *websocket.Conn) {
 func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	db := OpenDatabase()
 	defer db.Close()
-	
+	name:=GetUserName(db,message.From)
 	From := message.From
 	To := GetUserID(db, message.To)
 	fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
+	recipientConn, ok := userSockets[To]
+			if ok {
+				nmmessage := ServerMessage{Type: "PM",From: name ,Message: message.Text}
+				err := recipientConn.WriteJSON(nmmessage)
+				//fmt.Println(nmmessage)
+				if err != nil {
+					log.Println("Error writing to WebSocket:", err)
+					return
+				}
+			}
 }
 
 func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
@@ -140,3 +160,35 @@ func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 	fmt.Println(message)
 
 }
+
+// func handleWebSocketConnection(conn *websocket.Conn, cookieValue string) {
+// 	// SessionsMutex is a mutex to lock the sessions map when adding or removing sessions from it
+// 	var sessionsMutex sync.Mutex
+// 	fmt.Println("New WebSocket Connection", conn.RemoteAddr().String())
+
+// 	if cookieValue != "" {
+// 		for _, v := range LoggedInUsers {
+// 			if v.Cookie == cookieValue[14:] {
+// 				fmt.Println("Server >> User is logged in with cookie value: ", cookieValue)
+// 				fmt.Println("Server >> Updating connection ID for user: ", v.Username)
+// 				v.WebSocketConn = conn.RemoteAddr().String()
+// 			}
+// 		}
+// 	} else {
+// 		fmt.Println("Server >> User is not logged in")
+// 		conn.WriteJSON(ServerMessage{Type: "status", Data: map[string]string{"refresh": "true"}})
+// 	}
+
+// 	// Create a new session for the WebSocket client
+// 	session := Session{
+// 		WebSocketConn: conn.RemoteAddr().String(),
+// 		UserID:        0,
+// 	}
+
+// 	// Add the session to the clients map
+// 	// Note: you need to synchronize access to the map using a mutex
+// 	sessionsMutex.Lock()
+// 	clients[conn] = &session
+// 	sessionsMutex.Unlock()
+
+// }

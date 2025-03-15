@@ -17,7 +17,8 @@ func (app *GlobalApp) Routes() http.Handler {
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("/ws", handlers.HandleWebSocket)
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		handlers.HandleWebSocket(app.App, w, r)})
 
 	mux.HandleFunc("GET /chat", handlers.GetHome)
 

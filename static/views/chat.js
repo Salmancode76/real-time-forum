@@ -49,7 +49,23 @@ export function loadUsers(){
   socket.send(JSON.stringify({"type": "get_users"}));
 }
 
+export function PM(msg){
+  console.log("PM=====>"+msg.from)
+  console.log("PM=====>"+msg.message)
+ let messagesDiv = document.getElementById("messages");
+  const now = new Date();
+      const formattedTime = formatTime(now);
 
+      // Create a div element for the message
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message'); // add class for styling
+
+      // Set the text content of the div
+      messageDiv.textContent = msg.from + " (" + formattedTime + "): " + msg.message;
+
+      // Append the div to the messagesDiv
+      messagesDiv.appendChild(messageDiv);
+}
 export function showUsers(msg){
   // const data = JSON.parse(msg);
    //console.log(msg)
