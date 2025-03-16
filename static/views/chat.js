@@ -4,7 +4,7 @@ import * as session from './Session.js'
 
 let currentChatUser = null;
 let currentUser = session.testCookie()
-let currentname=null
+let currentname="Me"
 
 export class Chat extends BasePage {
   constructor() {
