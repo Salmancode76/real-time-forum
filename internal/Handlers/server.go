@@ -148,12 +148,13 @@ func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 	db := OpenDatabase()
 	defer db.Close()
-
 	To := m.To
 	From := GetUserID(db, m.From)
-	fmt.Println(To)
-	fmt.Println(From)
-	messages := GetChatHistory(To, From, 0)
+	//fmt.Println(To)
+	//fmt.Println(From)
+		fmt.Println("New message  ",m)
+
+	messages := GetChatHistory(To, From, m.Set)
 
 	message := ServerMessage{Type: "oldmessages", ChatHistory: messages}
 	conn.WriteJSON(message)

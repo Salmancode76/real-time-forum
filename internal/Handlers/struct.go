@@ -14,6 +14,8 @@ type MyMessage struct {
 	From string `json:"from"`
 	To   string `json:"to"`
 	Text string `json:"text"`
+	Set int   `json:"set"`
+
 }
 
 // Struct to define a session

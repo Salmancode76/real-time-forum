@@ -3,8 +3,13 @@ import {socket} from './socket.js'
 import * as session from './Session.js'
 
 let currentChatUser = null;
-let currentUser = session.testCookie()
-let currentname=null
+let currentUser = session.testCookie();
+
+let isPrependMessages= false;
+let currentname=null;
+
+   let set = 0;
+
 
 export class Chat extends BasePage {
   constructor() {
@@ -15,11 +20,15 @@ export class Chat extends BasePage {
   static getHtml() {
     return `
       <div class="container">
-        <div class="column" id="DM">
+        <div class="chats" id="DM">
+              <!--  
+
           <h2>Column 1</h2>
           <p>Some text for the first column. This can be any HTML content.</p>
+          -->
         </div>
-        <div class="column">
+
+      <!--   <div class="column"> 
           <h2>Column 2</h2>
           <div class="nested-row">
             <h3>Row 1</h3>
@@ -30,9 +39,13 @@ export class Chat extends BasePage {
             <br>
             <input type="text" id="messageInput" placeholder="Enter a message">
             <button id="clicked">Send Message</button>
-            <div id="output"></div>
-          </div>
-          <div class="nested-row" id="user-list">
+           
+                     </div>
+
+            -->
+
+
+          <div class="user_lists" id="user-list">
             <h3>Row 2</h3>
             <p>Content for the second row within the second column.</p>
           </div>
@@ -43,6 +56,57 @@ export class Chat extends BasePage {
 
 
 }
+
+const throttledGetHistory = throttle(() => {
+  set += 10;
+  isPrependMessages = true;
+  socket.send(
+    JSON.stringify({
+      type: "get_chat_history",
+      from: currentChatUser.name,
+      to: currentUser,
+      set: set,
+    })
+  );
+}, 100);
+
+function throttle(func,delay){
+  let LastTime=0;
+  return function(...args){
+    let now =  Date.now();
+    if(now - LastTime >= delay){
+      LastTime=now;
+      func.apply(this, args);
+    }
+  }
+}
+
+
+function listenSroll(){
+  const messageContainer = document.getElementById("message-container");
+
+  messageContainer.addEventListener("scroll", () => {
+    
+   if (messageContainer.scrollTop <= 0 ) {
+
+     //alert("Time for new messages " + set);
+       //showMessages(data, currentUser, currentChatUser.name, set);
+ 
+      throttledGetHistory();
+      messageContainer.scrollTop = 10;
+           
+         // alert(currentChatUser.name);
+          //alert(currentname);
+      isPrependMessages = true;
+          
+
+   }
+  });
+    console.log("Scrolled to: ", messageContainer.scrollTop);
+}
+
+
+
 export function loadUsers(){
   
 
@@ -66,6 +130,7 @@ export function PM(msg){
 
       // Append the div to the messagesDiv
       messagesDiv.appendChild(messageDiv);
+
 }
 export function showUsers(msg){
   // const data = JSON.parse(msg);
@@ -109,10 +174,27 @@ export function showUsers(msg){
  
          userContainer.addEventListener("click", () => {
            //getHistoy()
-           socket.send(JSON.stringify({"type": "get_chat_history","from":user.name,"to":currentUser}));
+
+           isPrependMessages = false;
+           set = 0;
+           socket.send(
+             JSON.stringify({
+               type: "get_chat_history",
+               from: user.name,
+               to: currentUser,
+               set: set,
+             })
+           );
            console.log("Clicked on user: " + user.name);
            currentChatUser = user;
-         });
+
+           let messagesDiv = document.getElementById("message-container");
+           messagesDiv.innerHTML = "";
+
+           //adding
+          setTimeout(() => listenSroll(), 200);
+
+          });
  
          usersDiv.appendChild(userContainer);
         
@@ -142,80 +224,135 @@ export function showUsers(msg){
 
 export function oldmessagesofserv(data){
   
-  DM();
-  showMessages(data,currentUser,currentChatUser.name);
+  if (!document.getElementById("messages")) {
+    DM();
+
+    
+  }  
+  showMessages(data, currentUser, currentChatUser.name, set, isPrependMessages);
+
 }
 
 function DM(){
   const dmDiv = document.getElementById("DM");
   dmDiv.innerHTML = "";
-let template = `<div id="message-container">
+  let template = `<div id="message-container">
     <div id="messages">
    
     </div>
     <form id="send-container">
       <input type="text" id="message-input" placeholder="Type your message...">
-      <button id="submit" type="submit">send</button>
+      <button id="send_message" type="submit">send</button>
     </form>
-  </div>`
-  
+  </div>`;
+
   dmDiv.innerHTML = template;
- 
+
+  listenSroll();
 
 
-}
+
+  }
 
 
 //build messages 
-function showMessages(data,from,to) {
-console.log(data)
-let messagesDiv = document.getElementById("messages");
-messagesDiv.innerHTML = '';
+function showMessages(data, from, to, set, isPrependMessages) {
+  console.log(data);
+  let messagesDiv = document.getElementById("messages");
+  //messagesDiv.innerHTML = '';
 
-for (let i = data.length - 1; i >= 0; --i) {
-  messagesDiv.appendChild(buildMessageDiv(data[i]));
-}
- 
-    const form = document.getElementById('send-container');
-    const messageInput = document.getElementById('message-input');
+
+  
+  if(isPrependMessages) {
+  for (let i = 0; i <= data.length - 1; i++) {
+    messagesDiv.prepend(buildMessageDiv(data[i], to));
+  }
+   
+  }else{
     
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
+  for (let i = data.length - 1; i >= 0; --i) {
+    messagesDiv.appendChild(buildMessageDiv(data[i], to));
+  }
+      //messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      const message = messageInput.value;
-      console.log('Message:', message);
-      socket.send(JSON.stringify({
-          "type": "message",
-          "From": from,
-          "To": to,
-          "Text": message
-      }));
-      messageInput.value = '';
+  }
 
-      const now = new Date();
-      const formattedTime = formatTime(now);
+  // scrollToBottom();
 
-      // Create a div element for the message
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message'); // add class for styling
+  //Scrolling down when load
 
-      // Set the text content of the div
-      messageDiv.textContent = currentname+ " (" + formattedTime + "): " + message;
 
-      // Append the div to the messagesDiv
-      messagesDiv.appendChild(messageDiv);
+      //messageContainer.scrollTop = 10;
+
+  
+
+
+  const form = document.getElementById("send-container");
+  const messageInput = document.getElementById("message-input");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const message = messageInput.value;
+    console.log("Message:", message);
+    if(message.trim()=== "") {
+      return;
+    }
+    socket.send(
+      JSON.stringify({
+        type: "message",
+        From: from,
+        To: to,
+        Text: message,
+        set: set,
+      })
+    );
+    messageInput.value = "";
+
+    const now = new Date();
+    const formattedTime = formatTime(now);
+
+    // Create a div element for the message
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message"); // add class for styling
+
+    // Set the text content of the div
+    messageDiv.textContent =
+      currentname + " (" + formattedTime + "): " + message;
+
+    // Append the div to the messagesDiv
+    messagesDiv.appendChild(messageDiv);
   });
-    
 }
 
 
 // Function to build message div
-function buildMessageDiv(msgData) {
-let div = document.createElement('div');
-div.classList = 'message';
-div.innerText = msgData.from + " (" + msgData.createdat + "): " + msgData.text;
-currentname=msgData.from
-return div;
+function buildMessageDiv(msgData, to) {
+  console.log(to);
+  const isSelf = to === msgData.from;
+;
+
+  let div = document.createElement("div");
+  div.classList.add("message", !isSelf ? "self" : "other");
+
+  let divName = document.createElement("div");
+  divName.classList.add("sender");
+  divName.textContent = msgData.from;
+
+  let divTime = document.createElement("div");
+  divTime.classList.add("timestamp");
+  divTime.textContent = msgData.createdat;
+
+  let divText = document.createElement("div");
+  divText.classList.add("message-content");
+  divText.textContent = msgData.text;
+
+    
+    div.appendChild(divName);
+  div.appendChild(divText);
+  div.appendChild(divTime);
+
+  return div;
 }
 
 
