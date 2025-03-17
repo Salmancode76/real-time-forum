@@ -15,6 +15,7 @@ type MyMessage struct {
 	To   string `json:"to"`
 	Text string `json:"text"`
 	Set int   `json:"set"`
+	Read string `json:"isread"`
 
 }
 

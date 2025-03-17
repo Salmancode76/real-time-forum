@@ -131,6 +131,9 @@ export function PM(msg){
       // Append the div to the messagesDiv
       messagesDiv.appendChild(messageDiv);
 
+        readMessage(currentChatUser.name, currentUser);
+
+
 }
 export function showUsers(msg){
   // const data = JSON.parse(msg);
@@ -193,6 +196,9 @@ export function showUsers(msg){
 
            //adding
           setTimeout(() => listenSroll(), 200);
+            alert(user.name +"  " +currentUser);
+
+          readMessage(user.name,currentUser);
 
           });
  
@@ -201,6 +207,20 @@ export function showUsers(msg){
      }
    
  }
+
+ function readMessage(sender,receiver){
+
+
+
+  socket.send(
+    JSON.stringify({
+      type: "read_message",
+      from: sender,
+      to: receiver,
+    })
+  );
+ }
+
 
 
  function sort(arr) {
@@ -230,6 +250,7 @@ export function oldmessagesofserv(data){
     
   }  
   showMessages(data, currentUser, currentChatUser.name, set, isPrependMessages);
+  readMessage(currentChatUser.name,currentUser);
 
 }
 
@@ -257,6 +278,8 @@ function DM(){
 
 //build messages 
 function showMessages(data, from, to, set, isPrependMessages) {
+
+
   console.log(data);
   let messagesDiv = document.getElementById("messages");
   //messagesDiv.innerHTML = '';
@@ -307,6 +330,8 @@ function showMessages(data, from, to, set, isPrependMessages) {
         set: set,
       })
     );
+       readMessage(to, from);
+
     messageInput.value = "";
 
     const now = new Date();
@@ -321,6 +346,7 @@ function showMessages(data, from, to, set, isPrependMessages) {
       currentname + " (" + formattedTime + "): " + message;
 
     // Append the div to the messagesDiv
+    
     messagesDiv.appendChild(messageDiv);
   });
 }
@@ -347,7 +373,14 @@ function buildMessageDiv(msgData, to) {
   divText.classList.add("message-content");
   divText.textContent = msgData.text;
 
-    
+  let tick = document.createElement("div");
+  tick.classList.add("timestamp");
+  if (msgData.isread && !isSelf) {
+    tick.textContent = "✓✓";
+    tick.style.color = "#427eff"; // Hex code for blue
+  } 
+     div.appendChild(tick);
+
     div.appendChild(divName);
   div.appendChild(divText);
   div.appendChild(divTime);

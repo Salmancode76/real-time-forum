@@ -99,6 +99,9 @@ func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
 		handleGetUsersMessage(conn)
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
+	case "read_message":
+		fmt.Println(message.From)
+		SetRead(message.From, message.To)
 
 	}
 }
