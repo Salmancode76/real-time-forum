@@ -25,6 +25,8 @@ var upgrader = websocket.Upgrader{
 func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 	
 	cookie, err := r.Cookie("userID")
+	
+
 	fmt.Println("cookie name =",cookie.Name)
 	fmt.Println("cookie value =",cookie.Value)
 	
@@ -100,8 +102,9 @@ func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
 	case "read_message":
-		fmt.Println(message.From)
 		SetRead(message.From, message.To)
+	 default:
+        log.Printf("Unsupported message type: %s", message.Type)
 
 	}
 }

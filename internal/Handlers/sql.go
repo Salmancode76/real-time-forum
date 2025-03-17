@@ -19,12 +19,12 @@ func SetRead(from string, to string) {
 
 	db := OpenDatabase()
 	user:=GetUserID(db, from)
-	fmt.Println("wsncedhiwjbfchiwdb"+user + " "+to)
 	defer CloseDB(db)
 	_, err := db.Exec("UPDATE messages SET is_read = 1 WHERE from_id = ? AND to_id = ?", user, to)
 	if err != nil {
 		fmt.Printf("Server >> Error setting message as read: %s", err)
 	}
+
 }
 
 func AddMessageToHistory(fromUSer string, toUser string, messageText string) {

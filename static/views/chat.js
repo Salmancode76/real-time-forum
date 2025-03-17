@@ -87,6 +87,7 @@ function listenSroll(){
 
   messageContainer.addEventListener("scroll", () => {
     
+    
    if (messageContainer.scrollTop <= 0 ) {
 
      //alert("Time for new messages " + set);
@@ -102,6 +103,8 @@ function listenSroll(){
 
    }
   });
+
+  
     console.log("Scrolled to: ", messageContainer.scrollTop);
 }
 
@@ -132,6 +135,7 @@ export function PM(msg){
       messagesDiv.appendChild(messageDiv);
 
         readMessage(currentChatUser.name, currentUser);
+        
 
 
 }
@@ -188,6 +192,7 @@ export function showUsers(msg){
                set: set,
              })
            );
+
            console.log("Clicked on user: " + user.name);
            currentChatUser = user;
 
@@ -195,10 +200,11 @@ export function showUsers(msg){
            messagesDiv.innerHTML = "";
 
            //adding
-          setTimeout(() => listenSroll(), 200);
-            alert(user.name +"  " +currentUser);
+          //setTimeout(() => listenSroll(), 500);
+           
 
           readMessage(user.name,currentUser);
+          document.getElementById("message");
 
           });
  
@@ -257,7 +263,10 @@ export function oldmessagesofserv(data){
 function DM(){
   const dmDiv = document.getElementById("DM");
   dmDiv.innerHTML = "";
-  let template = `<div id="message-container">
+  let template = 
+  
+  `<div id="message-container" tabindex="0">
+
     <div id="messages">
    
     </div>
@@ -269,11 +278,36 @@ function DM(){
 
   dmDiv.innerHTML = template;
 
+  const messageContainer = document.getElementById("message-container");
+  messageContainer.addEventListener("focus",()=>{
+    if(currentChatUser) 
+      {
+         readMessage(currentChatUser.name,currentUser);
+      }
+      })
+
   listenSroll();
 
 
 
+
+
+
   }
+  /*
+ export function  updateReadStatus(sender){
+      const messages = document.querySelectorAll(".message");
+      messages.forEach((message) => {
+        const messageSender = message.querySelector(".sender").textContent;
+        if (messageSender === sender) {
+          const tick = message.querySelector(".timestamp");
+          tick.textContent = "✓✓";
+          tick.style.color = "#427eff";
+        }
+      });
+  }
+      */
+
 
 
 //build messages 
@@ -373,6 +407,7 @@ function buildMessageDiv(msgData, to) {
   divText.classList.add("message-content");
   divText.textContent = msgData.text;
 
+  /*
   let tick = document.createElement("div");
   tick.classList.add("timestamp");
   if (msgData.isread && !isSelf) {
@@ -380,6 +415,7 @@ function buildMessageDiv(msgData, to) {
     tick.style.color = "#427eff"; // Hex code for blue
   } 
      div.appendChild(tick);
+     */
 
     div.appendChild(divName);
   div.appendChild(divText);

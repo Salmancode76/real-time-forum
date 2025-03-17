@@ -39,6 +39,13 @@ const msg = JSON.parse(e.data)
         break
         case "PM":
         Chat.PM(msg)
+        //mine
+        /*
+        case "message_read":
+        updateReadStatus(msg.from);
+
+         break
+         */
         default:
         console.log("Msg type not supported : " + msg.type)
         break

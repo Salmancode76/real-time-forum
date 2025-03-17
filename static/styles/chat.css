@@ -14,6 +14,9 @@
   width: 40%;
   border-radius: 1em;
   padding: 1em;
+  font-size: 1.5vw;
+  word-wrap: break-word;
+
 }
 
 .chats {
@@ -25,10 +28,10 @@
 #message-container {
   width: 100%;
   max-width: 1200px;
-  height: 100dvh;
+  height: 500px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; 
+  overflow-y:scroll; 
   border: 1px solid #ccc;
   border-radius: 1em;
   padding: 10px;
@@ -117,4 +120,45 @@
 
 #send_message:hover {
   background-color: #B5734C;
+}
+@media (max-width: 768px) {
+  .container {
+  display: flex;
+  height: 100%;
+  flex-direction: column-reverse;
+  justify-content: space-around;
+  align-content: space-around;
+  padding: 1em;
+  width: 100%;
+}
+
+.user_lists {
+  background-color: #363636;
+  width: 100%;
+  border-radius: 1em;
+  padding: 1em;
+  font-size: 3.5vw;
+  word-wrap: break-word;
+  margin-bottom: 1.5em;
+
+}
+
+.chats {
+  display: flex;
+  justify-items: center;
+  width: 100%;
+}
+
+#message-container {
+  width: 100%;
+  max-width: 1200px;
+  height: 300PX;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #1A1A1A;
+}
 }
