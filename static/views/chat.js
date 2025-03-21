@@ -1,12 +1,12 @@
 import { BasePage } from "./BasePage.js";
 import {socket} from './socket.js'
 import * as session from './Session.js'
-
-let currentChatUser = null;
+import { Curruser } from "./login.js";
+let currentChatUser =null;
 let currentUser = session.testCookie();
 
 let isPrependMessages= false;
-let currentname=null;
+let currentname=Curruser;
 
    let set = 0;
 
@@ -377,9 +377,10 @@ function showMessages(data, from, to, set, isPrependMessages) {
 
     // Set the text content of the div
     messageDiv.textContent =
-      currentname + " (" + formattedTime + "): " + message;
+      Curruser + " (" + formattedTime + "): " + message;
 
     // Append the div to the messagesDiv
+   console.log(Curruser)
     
     messagesDiv.appendChild(messageDiv);
   });

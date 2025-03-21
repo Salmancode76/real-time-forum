@@ -95,7 +95,7 @@ func PostLogin(app *models.App) http.HandlerFunc {
 
 		id := strconv.Itoa(user.UserID)
 
-		app.Session[id] = Cookies(w, id)
+		app.Session[id] = Cookies(w, id,user.Username)
 		app.UserID[id] = user.Username
 
 		SendResponse(w, "Login", "User authenticated", true, http.StatusOK)

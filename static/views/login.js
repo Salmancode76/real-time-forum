@@ -1,5 +1,8 @@
 import { BasePage } from './BasePage.js';
 
+
+
+export var Curruser
 export class login extends BasePage{
     constructor(){
         super(login.getHTml());
@@ -59,6 +62,8 @@ export class login extends BasePage{
             if (!data.Success){
                 document.getElementById("res").innerText = "ERROR:  "+ data.message;
             }else{
+                Curruser=FormData.uename
+                console.log(Curruser)
                    setTimeout(() => {
                                         navigateTo('/');
                                     }, 2000);
