@@ -33,7 +33,11 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 		log.Printf("WebSocket upgrade failed: %v", err)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		deleteConnection(conn)
+		conn.Close()
+	}()
+	
 	userSockets[cookie.Value]=conn
 	// Configure ping/pong handlers
 	conn.SetPingHandler(func(string) error {
@@ -161,6 +165,16 @@ func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 
 }
 
+
+
+func deleteConnection(conn *websocket.Conn) {
+	for userID, userConn := range userSockets {
+		if userConn == conn {
+			delete(userSockets, userID)
+			return
+		}
+	}
+}
 // func handleWebSocketConnection(conn *websocket.Conn, cookieValue string) {
 // 	// SessionsMutex is a mutex to lock the sessions map when adding or removing sessions from it
 // 	var sessionsMutex sync.Mutex
