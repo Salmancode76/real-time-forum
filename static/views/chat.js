@@ -5,21 +5,32 @@ import * as session from './Session.js'
 let currentChatUser = null;
 let currentUser = session.testCookie();
 
-let isPrependMessages= false;
 let currentname=null;
+let userChatStates = {};
 
-   let set = 0;
+function getUserChateState(username) {
+  if(!userChatStates[username]) {
+    userChatStates[username] ={
+      set:0,
+      isPrependMessages:false
+    };
+  }
+  return userChatStates[username];
+}
+  //let isPrependMessages = false;
+
+   //let set = 0;
 
 
 export class Chat extends BasePage {
   constructor() {
-    super(Chat.getHtml());
+    super(Chat.getHtml("chat_container"));
    this.CheckAuth();
   }
 
   static getHtml() {
     return `
-      <div class="container">
+      <div class="container" id="chat_container">
         <div class="chats" id="DM">
               <!--  
 
@@ -58,14 +69,19 @@ export class Chat extends BasePage {
 }
 
 const throttledGetHistory = throttle(() => {
-  set += 10;
-  isPrependMessages = true;
+    if (!currentChatUser) return;
+  const userState = getUserChateState(currentChatUser.name);
+  //set += 10;
+  //isPrependMessages = true;
+
+  userState.set += 10;
+  userState.isPrependMessages = true;
   socket.send(
     JSON.stringify({
       type: "get_chat_history",
       from: currentChatUser.name,
       to: currentUser,
-      set: set,
+      set: userState.set,
     })
   );
 }, 100);
@@ -98,7 +114,11 @@ function listenSroll(){
            
          // alert(currentChatUser.name);
           //alert(currentname);
-      isPrependMessages = true;
+        if(currentChatUser){
+          const userState = getUserChateState(currentChatUser.name);
+          userState.isPrependMessages = true;
+        }
+     // isPrependMessages = true;
           
 
    }
@@ -125,18 +145,23 @@ export function PM(msg){
       const formattedTime = formatTime(now);
 
       // Create a div element for the message
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message'); // add class for styling
+      //const messageDiv = document.createElement('div');
+      //messageDiv.classList.add('message'); // add class for styling
 
       // Set the text content of the div
-      messageDiv.textContent = msg.from + " (" + formattedTime + "): " + msg.message;
+      //messageDiv.textContent = msg.from + " (" + formattedTime + "): " + msg.message;
 
       // Append the div to the messagesDiv
-      messagesDiv.appendChild(messageDiv);
+      msg.createdat = formattedTime;
+      msg.text = msg.message;
+      
+     messagesDiv.appendChild(buildMessageDiv(msg, msg.from));
 
-        readMessage(currentChatUser.name, currentUser);
-        
+      readMessage(currentChatUser.name, currentUser);
+            const messageContainer =
+              document.getElementById("message-container");
 
+        messageContainer.scrollTop = messageContainer.scrollHeight; 
 
 }
 export function showUsers(msg){
@@ -181,32 +206,51 @@ export function showUsers(msg){
  
          userContainer.addEventListener("click", () => {
            //getHistoy()
+           const userState = getUserChateState(user.name);
+           userState.set = 0;
+           userState.isPrependMessages = false;
+           // isPrependMessages = false;
+           console.log(
+             `Clicked on user: ${user.name}, reset state to: set=${userState.set}`
+           );
 
-           isPrependMessages = false;
-           set = 0;
+           const dmDiv = document.getElementById("DM");
+           if (dmDiv) {
+             dmDiv.innerHTML = "";
+           }
+
+           // Create fresh DM interface
+           DM();
+           currentChatUser = user;
+
+           // set = 0;
            socket.send(
              JSON.stringify({
                type: "get_chat_history",
                from: user.name,
                to: currentUser,
-               set: set,
+               set: userState.set,
              })
            );
 
            console.log("Clicked on user: " + user.name);
-           currentChatUser = user;
 
-           let messagesDiv = document.getElementById("message-container");
-           messagesDiv.innerHTML = "";
+           // let messagesDiv = document.getElementById("message-container");
+           //messagesDiv.innerHTML = "";
 
            //adding
-          //setTimeout(() => listenSroll(), 500);
-           
+           //setTimeout(() => listenSroll(), 500);
+           setTimeout(() => {
+             const messageContainer =
+               document.getElementById("message-container");
+               messageContainer.scrollTop = messageContainer.scrollHeight;
+             
+           }, 10); 
 
-          readMessage(user.name,currentUser);
-          document.getElementById("message");
+           readMessage(user.name, currentUser);
+         });
+                  
 
-          });
  
          usersDiv.appendChild(userContainer);
         
@@ -255,7 +299,7 @@ export function oldmessagesofserv(data){
 
     
   }  
-  showMessages(data, currentUser, currentChatUser.name, set, isPrependMessages);
+  showMessages(data, currentUser, currentChatUser.name, getUserChateState(currentChatUser.name).set, getUserChateState(currentChatUser.name).isPrependMessages);
   readMessage(currentChatUser.name,currentUser);
 
 }
@@ -263,17 +307,17 @@ export function oldmessagesofserv(data){
 function DM(){
   const dmDiv = document.getElementById("DM");
   dmDiv.innerHTML = "";
-  let template = 
-  
-  `<div id="message-container" tabindex="0">
+  let template = `<div id="message-container" tabindex="0">
 
     <div id="messages">
    
     </div>
+    <div class="sender_div">
     <form id="send-container">
       <input type="text" id="message-input" placeholder="Type your message...">
       <button id="send_message" type="submit">send</button>
     </form>
+    </div>
   </div>`;
 
   dmDiv.innerHTML = template;
@@ -347,10 +391,15 @@ function showMessages(data, from, to, set, isPrependMessages) {
   const form = document.getElementById("send-container");
   const messageInput = document.getElementById("message-input");
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit",  (event)=> {
     event.preventDefault();
     let nameUser = getname()
-    const message = messageInput.value;
+    const message = (messageInput.value).trim();
+    if(message === ""){
+      alert("MESSAGE CAN'T BE EMPTY");
+      location.reload();
+      return;
+    }
     console.log("Message:", message);
     if(message.trim()=== "") {
       return;
@@ -364,6 +413,7 @@ function showMessages(data, from, to, set, isPrependMessages) {
         set: set,
       })
     );
+
        readMessage(to, from);
 
     messageInput.value = "";
@@ -372,18 +422,26 @@ function showMessages(data, from, to, set, isPrependMessages) {
     const formattedTime = formatTime(now);
 
     // Create a div element for the message
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("message"); // add class for styling
-    const selfDiv = document.createElement("div");
-    selfDiv.classList.add("message","self");
+      let messagesDiv = document.getElementById("messages");
+
+    //const messageDiv = document.createElement("div");
+   // messageDiv.classList.add("message","self"); // add class for styling
+
     // Set the text content of the div
-    messageDiv.textContent =
-      nameUser + " (" + formattedTime + "): " + message;
+   // messageDiv.textContent =
+    //  nameUser + " (" + formattedTime + "): " + message;
+   const msg = {
+     from: getname(),
+     createdat: formattedTime,
+     text: message.trim(),
+     to: to,
+   };
+
+    //console.table(msg);
+    messagesDiv.appendChild(buildMessageDiv(msg, to));
 
     // Append the div to the messagesDiv
     
-    messagesDiv.appendChild(selfDiv);
-    selfDiv.appendChild(messageDiv);
   });
 }
 

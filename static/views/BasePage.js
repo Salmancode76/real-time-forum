@@ -55,7 +55,7 @@ export class BasePage {
  if (divElement) {
    divElement.style.display = "block";
  } else {
-        console.error(`Element with ID ${divName} not found`);
+       // console.error(`Element with ID ${divName} not found`);
  }    } catch (error) {
       console.error("Error checking authentication: ", error);
       document.getElementById("app").innerHTML =

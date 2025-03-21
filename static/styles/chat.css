@@ -18,6 +18,18 @@
   word-wrap: break-word;
 
 }
+.user-container{
+  margin: 0.5em;
+    background-color: #1A1A1A;
+    border-radius: 0.5em;
+
+
+}
+.user-container:hover{
+  background-color: #B5734C;
+  cursor: pointer;
+}
+
 
 .chats {
   display: flex;
@@ -44,6 +56,10 @@
   flex-direction: column;
   width: 100%;
   gap: 8px;
+}
+.sender_div{
+  position: sticky;
+  bottom: 0;
 }
 
 
@@ -111,9 +127,11 @@
   border-radius: 4px;
   font-size: 1.5vh;
   margin-right: 1em;
+  
 }
 
 #send_message {
+  cursor: pointer;
 
   width: 30%;
 }
@@ -121,6 +139,7 @@
 #send_message:hover {
   background-color: #B5734C;
 }
+
 @media (max-width: 768px) {
   .container {
   display: flex;

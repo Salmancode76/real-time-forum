@@ -25,10 +25,16 @@ var upgrader = websocket.Upgrader{
 func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 	
 	cookie, err := r.Cookie("userID")
-	
-
+	if err != nil {
+		log.Println("No cookie")
+		return
+	}else{
 	fmt.Println("cookie name =",cookie.Name)
 	fmt.Println("cookie value =",cookie.Value)
+	}
+	
+
+
 	
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
