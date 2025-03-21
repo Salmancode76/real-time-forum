@@ -1,12 +1,12 @@
 import { BasePage } from "./BasePage.js";
 import {socket} from './socket.js'
 import * as session from './Session.js'
-import { Curruser } from "./login.js";
-let currentChatUser =null;
+
+let currentChatUser = null;
 let currentUser = session.testCookie();
 
 let isPrependMessages= false;
-let currentname=Curruser;
+let currentname=null;
 
    let set = 0;
 
@@ -349,7 +349,7 @@ function showMessages(data, from, to, set, isPrependMessages) {
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-
+    let nameUser = getname()
     const message = messageInput.value;
     console.log("Message:", message);
     if(message.trim()=== "") {
@@ -374,17 +374,39 @@ function showMessages(data, from, to, set, isPrependMessages) {
     // Create a div element for the message
     const messageDiv = document.createElement("div");
     messageDiv.classList.add("message"); // add class for styling
-
+    const selfDiv = document.createElement("div");
+    selfDiv.classList.add("message","self");
     // Set the text content of the div
     messageDiv.textContent =
-      Curruser + " (" + formattedTime + "): " + message;
+      nameUser + " (" + formattedTime + "): " + message;
 
     // Append the div to the messagesDiv
-   console.log(Curruser)
     
-    messagesDiv.appendChild(messageDiv);
+    messagesDiv.appendChild(selfDiv);
+    selfDiv.appendChild(messageDiv);
   });
 }
+
+function getname(){
+  const allCookies = document.cookie;
+ // console.log(allCookies)
+  // Split the cookies into an array
+  const cookiesArray = allCookies.split(';');
+  
+  // Loop through the array to find the specific cookie
+  let sessionCookieValue = null;
+  cookiesArray.forEach(cookie => {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'userName') {
+          sessionCookieValue = value;
+      }
+  });
+  
+  //.log('Session Cookie Value:', sessionCookieValue);
+  return sessionCookieValue
+}
+
+
 
 
 // Function to build message div

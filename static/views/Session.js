@@ -60,3 +60,24 @@ export function testCookie(){
   console.log('Session Cookie Value:', sessionCookieValue);
   return sessionCookieValue
 }
+
+
+export function getname(){
+    const allCookies = document.cookie;
+   // console.log(allCookies)
+    // Split the cookies into an array
+    const cookiesArray = allCookies.split(';');
+    
+    // Loop through the array to find the specific cookie
+    let sessionCookieValue = null;
+    cookiesArray.forEach(cookie => {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'userName') {
+            sessionCookieValue = value;
+        }
+    });
+    
+    //.log('Session Cookie Value:', sessionCookieValue);
+    return sessionCookieValue
+  }
+  
