@@ -521,3 +521,22 @@ function formatTime(date) {
 
 
 
+export function online(msg){
+  const divs = document.querySelectorAll('.user-container');
+
+  for (const key in msg.online) {
+     const value = msg.online[key];
+  
+     for (let i = 0; i < divs.length; i++) {
+      if (divs[i].textContent.trim() === value) {
+        // Find the span with the inline background color style.
+        const colorSpan = divs[i].querySelector('span[style*="background-color: red"]');
+  
+        if (colorSpan) { // Check if the span was found.
+          colorSpan.style.backgroundColor = "green";
+          console.log("green printed should change");
+        }
+  }
+}
+  }
+}

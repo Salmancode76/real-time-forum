@@ -39,8 +39,10 @@ const msg = JSON.parse(e.data)
         break
         case "PM":
         Chat.PM(msg)
-        
-        //This is here just to indicate that the message is supported
+        break
+        case "online":
+        Chat.online(msg)
+        break
         case "message_read":
         //updateReadStatus(msg.from);
         //do nothing in the frontend 

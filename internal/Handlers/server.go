@@ -12,7 +12,9 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
 var userSockets = make(map[string]*websocket.Conn)
+
 // var clients = make(map[*websocket.Conn]*Session)
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -23,26 +25,23 @@ var upgrader = websocket.Upgrader{
 }
 
 func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
-	
+
 	cookie, err := r.Cookie("userID")
 	if err != nil {
 		log.Println("No cookie")
 		return
-	}else{
-	fmt.Println("cookie name =",cookie.Name)
-	fmt.Println("cookie value =",cookie.Value)
+	} else {
+		fmt.Println("cookie name =", cookie.Name)
+		fmt.Println("cookie value =", cookie.Value)
 	}
-	
 
-
-	
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("WebSocket upgrade failed: %v", err)
 		return
 	}
 	defer conn.Close()
-	userSockets[cookie.Value]=conn
+	userSockets[cookie.Value] = conn
 	// Configure ping/pong handlers
 	conn.SetPingHandler(func(string) error {
 		log.Println("Received ping, sending pong")
@@ -90,12 +89,12 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 		//fmt.Println(myMessage)
 		// cookieValue := r.Header.Get("Cookie")
 		// handleWebSocketConnection(conn, cookieValue)
-		handleWebSocketMessage(conn, myMessage)
+		handleWebSocketMessage(app, conn, myMessage)
 
 	}
 }
 
-func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
+func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMessage) {
 	//fmt.Println("Message received: ", message.Type)
 
 	switch message.Type {
@@ -105,12 +104,13 @@ func handleWebSocketMessage(conn *websocket.Conn, message MyMessage) {
 	case "get_users":
 		fmt.Println("will get users now=======>>>>>")
 		handleGetUsersMessage(conn)
+		onlineusers(app, conn)
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
 	case "read_message":
 		SetRead(message.From, message.To)
-	 default:
-        log.Printf("Unsupported message type: %s", message.Type)
+	default:
+		log.Printf("Unsupported message type: %s", message.Type)
 
 	}
 }
@@ -137,24 +137,32 @@ func handleGetUsersMessage(conn *websocket.Conn) {
 	conn.WriteJSON(message)
 	//fmt.Println(message)
 }
+
+func onlineusers(app *models.App, conn *websocket.Conn) {
+
+	message := ServerMessage{Type: "online", Online: app.UserID}
+	conn.WriteJSON(message)
+	fmt.Println("the online message is ", message.Online)
+}
+
 func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	db := OpenDatabase()
 	defer db.Close()
-	name:=GetUserName(db,message.From)
+	name := GetUserName(db, message.From)
 	From := message.From
 	To := GetUserID(db, message.To)
 	fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
 	recipientConn, ok := userSockets[To]
-			if ok {
-				nmmessage := ServerMessage{Type: "PM",From: name ,Message: message.Text}
-				err := recipientConn.WriteJSON(nmmessage)
-				//fmt.Println(nmmessage)
-				if err != nil {
-					log.Println("Error writing to WebSocket:", err)
-					return
-				}
-			}
+	if ok {
+		nmmessage := ServerMessage{Type: "PM", From: name, Message: message.Text}
+		err := recipientConn.WriteJSON(nmmessage)
+		//fmt.Println(nmmessage)
+		if err != nil {
+			log.Println("Error writing to WebSocket:", err)
+			return
+		}
+	}
 }
 
 func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
@@ -164,7 +172,7 @@ func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 	From := GetUserID(db, m.From)
 	//fmt.Println(To)
 	//fmt.Println(From)
-		fmt.Println("New message  ",m)
+	fmt.Println("New message  ", m)
 
 	messages := GetChatHistory(To, From, m.Set)
 

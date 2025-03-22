@@ -128,6 +128,7 @@ type ServerMessage struct {
 	Users       []ServerUser      `json:"users"`
 	Categories  []ServerCategory  `json:"categories"`
 	Posts       []ServerPost      `json:"posts"`
+	Online      map[string]string `json:"online"`
 	User        ServerUser        `json:"user"`
 	Post        ServerPost        `json:"post"`
 	Category    ServerCategory    `json:"category"`
