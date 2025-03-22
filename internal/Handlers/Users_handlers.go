@@ -95,8 +95,9 @@ func PostLogin(app *models.App) http.HandlerFunc {
 
 		id := strconv.Itoa(user.UserID)
 
-		app.Session[id] = Cookies(w, id,user.Username)
+		app.Session[id] = Cookies(w, id, user.Username)
 		app.UserID[id] = user.Username
+		UpdateOnlineUsers(app)
 
 		SendResponse(w, "Login", "User authenticated", true, http.StatusOK)
 
@@ -119,8 +120,9 @@ func Logout(app *models.App) http.HandlerFunc {
 		tempID := strconv.Itoa(user.UserID)
 
 		delete(app.Session, tempID)
-		delete(app.UserID, user.Username)
+		delete(app.UserID, string(user.UserID))
 		w.WriteHeader(http.StatusNoContent)
+		UpdateOfflineUsers(app,user.Username)
 
 	}
 }

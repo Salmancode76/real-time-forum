@@ -517,9 +517,20 @@ function formatTime(date) {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+export function offline(msg){
+  console.log(msg)
+  const div = document.querySelectorAll('.user-container');
+  for (const element of div) {
+    if (element.textContent.trim() === msg.to) {
+      const colorSpan = element.querySelector('span[style*="background-color: green"]');
+  
+      if (colorSpan) { // Check if the span was found.
+        colorSpan.style.backgroundColor = "red";
+        console.log("green printed should change");    }
+  }
+}
 
-
-
+}
 
 export function online(msg){
   const divs = document.querySelectorAll('.user-container');

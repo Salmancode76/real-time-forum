@@ -1,3 +1,6 @@
+import {socket} from './socket.js'
+import{testCookie} from './Session.js'
+
 export class BasePage {
   constructor(html) {
     
@@ -42,8 +45,21 @@ export class BasePage {
                 </ul>
             </nav>
     `;
+    const logout= document.getElementById("logout_link");
+    if (logout){
+      logout.addEventListener("click",  ()=> {
+        console.log ("logging out")
+          socket.send(
+          JSON.stringify({
+            Type: "logout",
+            From: "36",
+            //testCookie()
+          })
+        );
+      })
+    }
 
-        const hamIcon = document.getElementById("hamICON");
+     const hamIcon = document.getElementById("hamICON");
         if (hamIcon) {
           hamIcon.addEventListener("click",  ()=> {
             const links = document.querySelector(".nav-links");

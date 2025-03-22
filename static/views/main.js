@@ -43,6 +43,10 @@ const msg = JSON.parse(e.data)
         case "online":
         Chat.online(msg)
         break
+        case "offline":
+        console.log("offiline tringered")
+        Chat.offline(msg)
+        break
         case "message_read":
         //updateReadStatus(msg.from);
         //do nothing in the frontend 

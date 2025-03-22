@@ -13,9 +13,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var userSockets = make(map[string]*websocket.Conn)
+var sockets = make(map[string]websocket.Conn)
 
-// var clients = make(map[*websocket.Conn]*Session)
+var userSockets *map[string]websocket.Conn = &sockets
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -40,8 +41,8 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 		log.Printf("WebSocket upgrade failed: %v", err)
 		return
 	}
-	defer conn.Close()
-	userSockets[cookie.Value] = conn
+
+	(*userSockets)[cookie.Value] = *conn
 	// Configure ping/pong handlers
 	conn.SetPingHandler(func(string) error {
 		log.Println("Received ping, sending pong")
@@ -60,6 +61,7 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 			case <-ticker.C:
 				if err := conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(time.Second)); err != nil {
 					log.Printf("Ping failed: %v", err)
+
 					return
 				}
 			case <-done:
@@ -74,10 +76,11 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("Connection closed unexpectedly: %v", err)
+				delete(app.UserID, cookie.Value)
+				fmt.Println(app.UserID)
 			}
 			return
 		}
-
 		log.Printf("Received: %s", message)
 		if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
 			log.Printf("Write failed: %v", err)
@@ -92,6 +95,7 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 		handleWebSocketMessage(app, conn, myMessage)
 
 	}
+
 }
 
 func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMessage) {
@@ -109,10 +113,21 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 		handleGetChatHistoryMessage(conn, message)
 	case "read_message":
 		SetRead(message.From, message.To)
+	case "logout":
+		fmt.Println("logging out", message)
+		logoutUser(message.From, app)
 	default:
 		log.Printf("Unsupported message type: %s", message.Type)
 
 	}
+}
+
+func logoutUser(id string, app *models.App) {
+	fmt.Println("will remove log out user ====>",id)
+	delete(app.UserID, id)
+	fmt.Println(app.UserID)
+
+	
 }
 
 func OpenDatabase() *sql.DB {
@@ -153,7 +168,7 @@ func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	To := GetUserID(db, message.To)
 	fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
-	recipientConn, ok := userSockets[To]
+	recipientConn, ok := (*userSockets)[To]
 	if ok {
 		nmmessage := ServerMessage{Type: "PM", From: name, Message: message.Text}
 		err := recipientConn.WriteJSON(nmmessage)
@@ -180,6 +195,21 @@ func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 	conn.WriteJSON(message)
 	fmt.Println(message)
 
+}
+func UpdateOfflineUsers(app *models.App, name string){
+	fmt.Println("updating all offilne users")
+	message := ServerMessage{Type: "offline", To: name}
+	for _, socket := range *userSockets {
+		socket.WriteJSON(message)
+	}
+}
+
+func UpdateOnlineUsers(app *models.App) {
+	fmt.Println("updating all users")
+	message := ServerMessage{Type: "online", Online: app.UserID}
+	for _, socket := range *userSockets {
+		socket.WriteJSON(message)
+	}
 }
 
 // func handleWebSocketConnection(conn *websocket.Conn, cookieValue string) {
