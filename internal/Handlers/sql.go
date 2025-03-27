@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -18,7 +19,7 @@ func CloseDB(db *sql.DB) {
 func SetRead(from string, to string) {
 
 	db := OpenDatabase()
-	user:=GetUserID(db, from)
+	user := GetUserID(db, from)
 	defer CloseDB(db)
 	_, err := db.Exec("UPDATE messages SET is_read = 1 WHERE from_id = ? AND to_id = ?", user, to)
 	if err != nil {
@@ -92,8 +93,7 @@ func GetUsernameFromId(db *sql.DB, id string) string {
 	return username
 }
 
-
-func GetUserName(db *sql.DB,From string)string{
+func GetUserName(db *sql.DB, From string) string {
 	query := "SELECT Username FROM User WHERE UserID = ?"
 
 	// Execute the query and retrieve the user ID
@@ -121,6 +121,7 @@ func GetUserID(db *sql.DB, username string) string {
 }
 
 func getAllUsers(db *sql.DB) []string {
+
 	query := "SELECT Username FROM User"
 	var names []string
 	rows, err := db.Query(query)
@@ -136,4 +137,45 @@ func getAllUsers(db *sql.DB) []string {
 		names = append(names, name)
 	}
 	return names
+}
+
+func getFriends(db *sql.DB, to string) []string {
+
+	query := "SELECT Username FROM User"
+	var names []string
+	rows, err := db.Query(query)
+	if err != nil {
+		fmt.Printf("Server >> Error getting all users: %s", err)
+	}
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			fmt.Printf("Server >> Error getting all users: %s", err)
+		}
+		names = append(names, name)
+	}
+	return names
+}
+
+func GetLastMessage(db *sql.DB,senderId string, receiverId string) (int, string) {
+	var id int
+	var message string
+
+	err := db.QueryRow(`
+    SELECT id, text FROM messages
+    WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)
+    ORDER BY id DESC
+    LIMIT 1`,
+		senderId, receiverId, receiverId, senderId,
+	).Scan(&id, &message)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, ""
+		} else {
+			log.Fatal(err)
+		}
+	}
+
+	return id, message
 }

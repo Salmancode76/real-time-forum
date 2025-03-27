@@ -111,7 +111,7 @@ func Logout(app *models.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, ok := r.Context().Value(contextKeyUser).(entities.UserData)
 
-		fmt.Println(user)
+		//fmt.Println(user)
 		if !ok {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return

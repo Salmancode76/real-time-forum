@@ -134,7 +134,10 @@ export function loadUsers(){
   
 
   console.log("connecting to users====>")
-  socket.send(JSON.stringify({"type": "get_users"}));
+  socket.send(JSON.stringify({
+    "type": "get_users",
+    to: currentUser,
+  }));
 }
 
 export function PM(msg){

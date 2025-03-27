@@ -77,7 +77,7 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("Connection closed unexpectedly: %v", err)
 				delete(app.UserID, cookie.Value)
-				fmt.Println(app.UserID)
+				//fmt.Println(app.UserID)
 			}
 			return
 		}
@@ -99,14 +99,12 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 }
 
 func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMessage) {
-	//fmt.Println("Message received: ", message.Type)
 
 	switch message.Type {
 	case "message":
 		handleMessageMessage(conn, message)
-
 	case "get_users":
-		fmt.Println("will get users now=======>>>>>")
+		handleGetFriends(conn, message.To)
 		handleGetUsersMessage(conn)
 		onlineusers(app, conn)
 	case "get_chat_history":
@@ -114,7 +112,6 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 	case "read_message":
 		SetRead(message.From, message.To)
 	case "logout":
-		fmt.Println("logging out", message)
 		logoutUser(message.From, app)
 	default:
 		log.Printf("Unsupported message type: %s", message.Type)
@@ -123,11 +120,10 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 }
 
 func logoutUser(id string, app *models.App) {
-	fmt.Println("will remove log out user ====>",id)
+	// fmt.Println("will remove log out user ====>",id)
 	delete(app.UserID, id)
-	fmt.Println(app.UserID)
+	// fmt.Println(app.UserID)
 
-	
 }
 
 func OpenDatabase() *sql.DB {
@@ -139,11 +135,17 @@ func OpenDatabase() *sql.DB {
 	return db
 }
 
+func handleGetFriends(conn *websocket.Conn, to string) {
+	db := OpenDatabase()
+	defer db.Close()
+	users := getFriends(db, to)
+	fmt.Println(users)
+}
+
 func handleGetUsersMessage(conn *websocket.Conn) {
 	db := OpenDatabase()
 	defer db.Close()
 	users := getAllUsers(db)
-	//fmt.Println(users)
 	var allUsers []ServerUser
 	for _, i := range users {
 		allUsers = append(allUsers, ServerUser{Name: i})
@@ -157,7 +159,7 @@ func onlineusers(app *models.App, conn *websocket.Conn) {
 
 	message := ServerMessage{Type: "online", Online: app.UserID}
 	conn.WriteJSON(message)
-	fmt.Println("the online message is ", message.Online)
+	// fmt.Println("the online message is ", message.Online)
 }
 
 func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
@@ -166,7 +168,7 @@ func handleMessageMessage(conn *websocket.Conn, message MyMessage) {
 	name := GetUserName(db, message.From)
 	From := message.From
 	To := GetUserID(db, message.To)
-	fmt.Println(message.Text)
+	// fmt.Println(message.Text)
 	AddMessageToHistory(From, To, message.Text)
 	recipientConn, ok := (*userSockets)[To]
 	if ok {
@@ -187,16 +189,16 @@ func handleGetChatHistoryMessage(conn *websocket.Conn, m MyMessage) {
 	From := GetUserID(db, m.From)
 	//fmt.Println(To)
 	//fmt.Println(From)
-	fmt.Println("New message  ", m)
+	// fmt.Println("New message  ", m)
 
 	messages := GetChatHistory(To, From, m.Set)
 
 	message := ServerMessage{Type: "oldmessages", ChatHistory: messages}
 	conn.WriteJSON(message)
-	fmt.Println(message)
+	// fmt.Println(message)
 
 }
-func UpdateOfflineUsers(app *models.App, name string){
+func UpdateOfflineUsers(app *models.App, name string) {
 	fmt.Println("updating all offilne users")
 	message := ServerMessage{Type: "offline", To: name}
 	for _, socket := range *userSockets {

@@ -20,6 +20,9 @@ const msg = JSON.parse(e.data)
 //console.log(msg)
     // sends messages to appropriate functions
     switch (msg.type) {
+        case "frinds":
+        // online messages
+        break
         case "users":
        Chat.showUsers(msg)
        Session.testCookie()
