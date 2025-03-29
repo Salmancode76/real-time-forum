@@ -261,6 +261,103 @@ export function showUsers(msg){
    
  }
 
+
+ export function showFrinds(msg){
+  // const data = JSON.parse(msg);
+   //console.log(msg)
+     let data =msg
+     // update the div with the list of users
+     const usersDiv = document.getElementById("user-list");
+     usersDiv.innerHTML = "";
+     //const sorted = sort(data.users)
+     for (const user of data.users) {
+       const userContainer = document.createElement("div");
+         userContainer.className = "user-container";
+         userContainer.id = "user-" + user.name;
+ 
+         const greenCircle = document.createElement("span");
+         //to be changed to red
+         greenCircle.style.backgroundColor = "red";
+         greenCircle.style.width = "10px";
+         greenCircle.style.height = "10px";
+         greenCircle.style.borderRadius = "50%";
+         greenCircle.style.display = "inline-block";
+         greenCircle.style.marginRight = "10px";
+         greenCircle.style.marginLeft = "10px";
+         userContainer.appendChild(greenCircle);
+ 
+         const usernameElem = document.createElement("span");
+         usernameElem.className = "username";
+         usernameElem.textContent = user.name;
+         userContainer.appendChild(usernameElem);
+ 
+         // If the user has a last message, display it in the user list (this is the last message they sent or received)
+         if (currentChatUser === null || currentChatUser.id !== user.id) {
+           const bubbleGif = document.createElement("img");
+          // bubbleGif.src = "/style/bubble.gif";
+           bubbleGif.className = "bubble";
+           bubbleGif.style.marginLeft = "10px";
+           bubbleGif.setAttribute("data-recipient", user.name);
+           //console.log("Added recipient ID: " + user.username)
+           userContainer.appendChild(bubbleGif);
+         }
+ 
+         userContainer.addEventListener("click", () => {
+           //getHistoy()
+           const userState = getUserChateState(user.name);
+           userState.set = 0;
+           userState.isPrependMessages = false;
+           // isPrependMessages = false;
+           console.log(
+             `Clicked on user: ${user.name}, reset state to: set=${userState.set}`
+           );
+
+           const dmDiv = document.getElementById("DM");
+           if (dmDiv) {
+             dmDiv.innerHTML = "";
+           }
+
+           // Create fresh DM interface
+           DM();
+           currentChatUser = user;
+
+           // set = 0;
+           socket.send(
+             JSON.stringify({
+               type: "get_chat_history",
+               from: user.name,
+               to: currentUser,
+               set: userState.set,
+             })
+           );
+
+           console.log("Clicked on user: " + user.name);
+
+           // let messagesDiv = document.getElementById("message-container");
+           //messagesDiv.innerHTML = "";
+
+           //adding
+           //setTimeout(() => listenSroll(), 500);
+           setTimeout(() => {
+             const messageContainer =
+               document.getElementById("message-container");
+               messageContainer.scrollTop = messageContainer.scrollHeight;
+             
+           }, 10); 
+
+           readMessage(user.name, currentUser);
+         });
+                  
+
+ 
+         usersDiv.appendChild(userContainer);
+        
+     }
+   
+ }
+
+
+
  function readMessage(sender,receiver){
 
 

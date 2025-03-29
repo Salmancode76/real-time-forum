@@ -21,9 +21,13 @@ const msg = JSON.parse(e.data)
     // sends messages to appropriate functions
     switch (msg.type) {
         case "frinds":
-        // online messages
+        console.log("ever log")
+        console.log(msg)
+        Chat.showFrinds(msg)
         break
         case "users":
+        console.log("ever log")
+        console.log(msg)
        Chat.showUsers(msg)
        Session.testCookie()
         break

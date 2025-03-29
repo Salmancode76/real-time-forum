@@ -109,7 +109,6 @@ func GetUserName(db *sql.DB, From string) string {
 func GetUserID(db *sql.DB, username string) string {
 	// Prepare the SQL query to retrieve the user ID based on the username
 	query := "SELECT UserID FROM User WHERE Username = ?"
-
 	// Execute the query and retrieve the user ID
 	var userID string
 	err := db.QueryRow(query, username).Scan(&userID)
@@ -139,43 +138,84 @@ func getAllUsers(db *sql.DB) []string {
 	return names
 }
 
-func getFriends(db *sql.DB, to string) []string {
+// func getFriends(db *sql.DB, to string) []string {
 
-	query := "SELECT Username FROM User"
-	var names []string
-	rows, err := db.Query(query)
-	if err != nil {
-		fmt.Printf("Server >> Error getting all users: %s", err)
-	}
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			fmt.Printf("Server >> Error getting all users: %s", err)
-		}
-		names = append(names, name)
-	}
-	return names
-}
+// 	query := "SELECT Username FROM User WHERE UserID != ?"
+// 	var names []string
+// 	rows, err := db.Query(query,to)
+// 	if err != nil {
+// 		fmt.Printf("Server >> Error getting all users: %s", err)
+// 	}
+// 	for rows.Next() {
+// 		var name string
+// 		err = rows.Scan(&name)
+// 		if err != nil {
+// 			fmt.Printf("Server >> Error getting all users: %s", err)
+// 		}
+// 		names = append(names, name)
+// 	}
+// 	return names
+// }
 
-func GetLastMessage(db *sql.DB,senderId string, receiverId string) (int, string) {
-	var id int
+func GetLastMessage(db *sql.DB, senderId string, receiverId string) string {
+
 	var message string
-
+	fmt.Println(senderId)
 	err := db.QueryRow(`
-    SELECT id, text FROM messages
+    SELECT message FROM messages
     WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)
-    ORDER BY id DESC
+    ORDER BY messageID DESC
     LIMIT 1`,
 		senderId, receiverId, receiverId, senderId,
-	).Scan(&id, &message)
+	).Scan(&message)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, ""
+			return ""
 		} else {
 			log.Fatal(err)
 		}
 	}
 
-	return id, message
+	return message
 }
+
+// func GetOtherUsersData(UserId int, activeUsers []int) []User {
+// 	var Friends []User
+// 	var Stranger []User
+
+// 	// Query the database for post data
+// 	rows, err := Accountsdb.Query("SELECT id, Username, UserImg FROM accounts WHERE id != ?", UserId)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer rows.Close()
+
+// 	// Iterate over the rows and populate the Posts slice
+// 	for rows.Next() {
+// 		var User User
+// 		err := rows.Scan(&User.UserId, &User.Username, &User.ProfileImg)
+// 		if err != nil {
+// 			log.Println("Error scanning row:", err)
+// 			continue
+// 		}
+// 		User.MessageID, User.LastMessage = GetLastMessage(UserId, User.UserId)
+// 		if IsUserActive(User.UserId, activeUsers) {
+// 			User.Status = "Online"
+// 		} else {
+// 			User.Status = "Offline"
+// 		}
+// 		User.Notifications = GetNumOfNotifications(User.UserId, UserId)
+
+// 		if User.LastMessage == "" {
+// 			Stranger = append(Stranger, User)
+// 		} else {
+// 			Friends = append(Friends, User)
+// 		}
+// 	}
+// 	if err = rows.Err(); err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	Users := CombineUsers(Friends, Stranger)
+
+// 	return Users
+// }

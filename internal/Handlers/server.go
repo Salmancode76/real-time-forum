@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var allUsers []ServerUser
 var sockets = make(map[string]websocket.Conn)
 
 var userSockets *map[string]websocket.Conn = &sockets
@@ -105,8 +106,8 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 		handleMessageMessage(conn, message)
 	case "get_users":
 		handleGetFriends(conn, message.To)
-		handleGetUsersMessage(conn)
-		onlineusers(app, conn)
+		//handleGetUsersMessage(conn)
+		//onlineusers(app, conn)
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
 	case "read_message":
@@ -136,10 +137,34 @@ func OpenDatabase() *sql.DB {
 }
 
 func handleGetFriends(conn *websocket.Conn, to string) {
+
 	db := OpenDatabase()
 	defer db.Close()
-	users := getFriends(db, to)
-	fmt.Println(users)
+	users := getAllUsers(db)
+	var frinds []ServerUser
+	for _, i := range users {
+		name := GetUserID(db, i)
+		msg := GetLastMessage(db, name, to)
+		if msg == "" {
+			allUsers = append(allUsers, ServerUser{Name: i})
+			// Stranger = append(Stranger, User)
+		} else {
+			frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
+		}
+		// allUsers = append(allUsers, ServerUser{Name: i})
+	}
+	message := ServerMessage{Type: "frinds", Users: frinds}
+	conn.WriteJSON(message)
+	fmt.Println(message)
+
+	// db := OpenDatabase()
+	// defer db.Close()
+	// users := getFriends(db, to)
+
+	// if users != nil {
+	// 	fmt.Println("found users")
+	// }
+	// //fmt.Println(users)
 }
 
 func handleGetUsersMessage(conn *websocket.Conn) {
