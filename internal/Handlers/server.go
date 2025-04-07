@@ -157,7 +157,7 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
 	conn.WriteJSON(message)
-	fmt.Println(message)
+	//fmt.Println(message)
 
 	// db := OpenDatabase()
 	// defer db.Close()
@@ -172,8 +172,9 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 func handleGetUsersMessage(conn *websocket.Conn) {
 	message := ServerMessage{Type: "users", Users: allUsers}
 	conn.WriteJSON(message)
-	fmt.Println(message)
+	//fmt.Println(message)
 	message = ServerMessage{Type: "notify", Users: NotUsers}
+	conn.WriteJSON(message)
 
 }
 

@@ -56,6 +56,7 @@ const msg = JSON.parse(e.data)
          break
          case "notify":
         console.log(msg)
+        Chat.Unread(msg)
         //updateReadStatus(msg.from);
         //do nothing in the frontend 
          break

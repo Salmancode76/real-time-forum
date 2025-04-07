@@ -161,7 +161,7 @@ func GetLastMessage(db *sql.DB, senderId string, receiverId string) (string,int)
 
 	var message string
 	var read int
-	fmt.Println(senderId)
+	//fmt.Println(senderId)
 	err := db.QueryRow(`
     SELECT  message, is_read FROM messages
     WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)

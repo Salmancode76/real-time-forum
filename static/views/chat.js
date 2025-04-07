@@ -651,3 +651,21 @@ export function online(msg){
 }
   }
 }
+
+export function Unread(msg){
+  const divs = document.querySelectorAll('.user-container');
+
+  for (user in msg.users) {
+  
+     for (let i = 0; i < divs.length; i++) {
+      if (divs[i].textContent.trim() === user) {
+        const usernameSpan = divs[i].querySelector('.username');
+        if (usernameSpan) {
+          usernameSpan.style.color = 'red';
+          console.log("red text changed");
+        }
+   
+}
+  }
+}
+}
