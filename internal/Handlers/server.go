@@ -14,6 +14,7 @@ import (
 )
 
 var allUsers []ServerUser
+var NotUsers []ServerUser
 var sockets = make(map[string]websocket.Conn)
 
 var userSockets *map[string]websocket.Conn = &sockets
@@ -106,8 +107,8 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 		handleMessageMessage(conn, message)
 	case "get_users":
 		handleGetFriends(conn, message.To)
-		//handleGetUsersMessage(conn)
-		//onlineusers(app, conn)
+		handleGetUsersMessage(conn)
+		onlineusers(app, conn)
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
 	case "read_message":
@@ -144,14 +145,15 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 	var frinds []ServerUser
 	for _, i := range users {
 		name := GetUserID(db, i)
-		msg := GetLastMessage(db, name, to)
+		msg, read := GetLastMessage(db, name, to)
 		if msg == "" {
 			allUsers = append(allUsers, ServerUser{Name: i})
-			// Stranger = append(Stranger, User)
 		} else {
 			frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
+			if read == 0 {
+				NotUsers = append(NotUsers, ServerUser{Name: i})
+			}
 		}
-		// allUsers = append(allUsers, ServerUser{Name: i})
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
 	conn.WriteJSON(message)
@@ -168,23 +170,17 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 }
 
 func handleGetUsersMessage(conn *websocket.Conn) {
-	db := OpenDatabase()
-	defer db.Close()
-	users := getAllUsers(db)
-	var allUsers []ServerUser
-	for _, i := range users {
-		allUsers = append(allUsers, ServerUser{Name: i})
-	}
 	message := ServerMessage{Type: "users", Users: allUsers}
 	conn.WriteJSON(message)
-	//fmt.Println(message)
+	fmt.Println(message)
+	message = ServerMessage{Type: "notify", Users: NotUsers}
+
 }
 
 func onlineusers(app *models.App, conn *websocket.Conn) {
 
 	message := ServerMessage{Type: "online", Online: app.UserID}
 	conn.WriteJSON(message)
-	// fmt.Println("the online message is ", message.Online)
 }
 
 func handleMessageMessage(conn *websocket.Conn, message MyMessage) {

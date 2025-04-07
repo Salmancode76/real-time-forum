@@ -21,19 +21,15 @@ const msg = JSON.parse(e.data)
     // sends messages to appropriate functions
     switch (msg.type) {
         case "frinds":
-        console.log("ever log")
-        console.log(msg)
         Chat.showFrinds(msg)
         break
         case "users":
-        console.log("ever log")
-        console.log(msg)
        Chat.showUsers(msg)
        Session.testCookie()
         break
         case "oldmessages":
         Chat.oldmessagesofserv(msg.chathistory)
-        console.log(msg.chathistory)
+      //  console.log(msg.chathistory)
         break
         case "chat":
         Chat.receiveChatMsg(msg)
@@ -58,7 +54,11 @@ const msg = JSON.parse(e.data)
         //updateReadStatus(msg.from);
         //do nothing in the frontend 
          break
-         
+         case "notify":
+        console.log(msg)
+        //updateReadStatus(msg.from);
+        //do nothing in the frontend 
+         break
         default:
         console.log("Msg type not supported : " + msg.type)
         break
