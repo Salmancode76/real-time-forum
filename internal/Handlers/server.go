@@ -105,7 +105,7 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 	switch message.Type {
 	case "message":
 		handleMessageMessage(conn, message)
-		//send notification 
+		notifyMassage(conn, message)
 	case "get_users":
 		handleGetFriends(conn, message.To)
 		handleGetUsersMessage(conn)
@@ -237,34 +237,17 @@ func UpdateOnlineUsers(app *models.App) {
 	}
 }
 
-// func handleWebSocketConnection(conn *websocket.Conn, cookieValue string) {
-// 	// SessionsMutex is a mutex to lock the sessions map when adding or removing sessions from it
-// 	var sessionsMutex sync.Mutex
-// 	fmt.Println("New WebSocket Connection", conn.RemoteAddr().String())
-
-// 	if cookieValue != "" {
-// 		for _, v := range LoggedInUsers {
-// 			if v.Cookie == cookieValue[14:] {
-// 				fmt.Println("Server >> User is logged in with cookie value: ", cookieValue)
-// 				fmt.Println("Server >> Updating connection ID for user: ", v.Username)
-// 				v.WebSocketConn = conn.RemoteAddr().String()
-// 			}
-// 		}
-// 	} else {
-// 		fmt.Println("Server >> User is not logged in")
-// 		conn.WriteJSON(ServerMessage{Type: "status", Data: map[string]string{"refresh": "true"}})
-// 	}
-
-// 	// Create a new session for the WebSocket client
-// 	session := Session{
-// 		WebSocketConn: conn.RemoteAddr().String(),
-// 		UserID:        0,
-// 	}
-
-// 	// Add the session to the clients map
-// 	// Note: you need to synchronize access to the map using a mutex
-// 	sessionsMutex.Lock()
-// 	clients[conn] = &session
-// 	sessionsMutex.Unlock()
-
-// }
+func notifyMassage(conn *websocket.Conn, m MyMessage){
+	var	PMnotify []ServerUser
+	PMnotify = append(PMnotify, ServerUser{Name: m.From})
+	recipientConn, ok := (*userSockets)[m.To]
+	if ok {
+		nmmessage := ServerMessage{Type: "notify", Users: PMnotify}
+		err := recipientConn.WriteJSON(nmmessage)
+	
+		if err != nil {
+			log.Println("Error writing to WebSocket:", err)
+			return
+		}
+	}
+}
