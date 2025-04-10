@@ -105,6 +105,7 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 	switch message.Type {
 	case "message":
 		handleMessageMessage(conn, message)
+		//send notification 
 	case "get_users":
 		handleGetFriends(conn, message.To)
 		handleGetUsersMessage(conn)

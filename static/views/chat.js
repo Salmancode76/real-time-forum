@@ -173,7 +173,7 @@ export function showUsers(msg){
      let data =msg
      // update the div with the list of users
      const usersDiv = document.getElementById("user-list");
-    //  usersDiv.innerHTML = "";
+    usersDiv.innerHTML = "";
      const sorted = sort(data.users)
      for (const user of sorted) {
        const userContainer = document.createElement("div");
