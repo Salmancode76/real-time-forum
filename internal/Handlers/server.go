@@ -138,15 +138,15 @@ func OpenDatabase() *sql.DB {
 	return db
 }
 
-func isRedunat(AllUsers []ServerUser ,name ServerUser ) bool{
-	for _,i:= range AllUsers{
-		if i.Name == name.Name{
+func isRedunat(AllUsers []ServerUser, name ServerUser) bool {
+	for _, i := range AllUsers {
+		if i.Name == name.Name {
 			//fmt.Println("found user")
 			//fmt.Println(i.Name)
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -161,16 +161,16 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 		//instead of _ there was msg
 		_, read := GetLastMessage(db, name, to)
 		//if msg == "" {
-			if(!isRedunat(allUsers,ServerUser{Name: i})){
+		if (!isRedunat(allUsers, ServerUser{Name: i})) {
 
-				allUsers = append(allUsers, ServerUser{Name: i})
+			allUsers = append(allUsers, ServerUser{Name: i})
 
-		//	}
+			//	}
 		} //else {
-			frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
-			if read == 0 {
-				NotUsers = append(NotUsers, ServerUser{Name: i})
-			}
+		frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
+		if read == 0 {
+			NotUsers = append(NotUsers, ServerUser{Name: i})
+		}
 		//}
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
@@ -192,6 +192,7 @@ func handleGetUsersMessage(conn *websocket.Conn) {
 	conn.WriteJSON(message)
 	//fmt.Println(message)
 	message = ServerMessage{Type: "notify", Users: NotUsers}
+	NotUsers = []ServerUser{}
 	conn.WriteJSON(message)
 
 }
@@ -254,14 +255,15 @@ func UpdateOnlineUsers(app *models.App) {
 	}
 }
 
-func notifyMassage(conn *websocket.Conn, m MyMessage){
-	var	PMnotify []ServerUser
+func notifyMassage(conn *websocket.Conn, m MyMessage) {
+	var PMnotify []ServerUser
 	PMnotify = append(PMnotify, ServerUser{Name: m.From})
 	recipientConn, ok := (*userSockets)[m.To]
 	if ok {
 		nmmessage := ServerMessage{Type: "notify", Users: PMnotify}
+		PMnotify = []ServerUser{}
 		err := recipientConn.WriteJSON(nmmessage)
-	
+
 		if err != nil {
 			log.Println("Error writing to WebSocket:", err)
 			return
