@@ -209,6 +209,14 @@ export function showUsers(msg){
  
          userContainer.addEventListener("click", () => {
            //getHistoy()
+                document
+                  .getElementById("user-" + user.name)
+                  .querySelector(".username").style.color = "white";
+           /*
+           make text white after click
+     
+            */
+
            const userState = getUserChateState(user.name);
            userState.set = 0;
            userState.isPrependMessages = false;
@@ -304,6 +312,7 @@ export function showUsers(msg){
  
          userContainer.addEventListener("click", () => {
            //getHistoy()
+       
            const userState = getUserChateState(user.name);
            userState.set = 0;
            userState.isPrependMessages = false;
@@ -570,6 +579,7 @@ function getname(){
 // Function to build message div
 function buildMessageDiv(msgData, to) {
   console.log(to);
+
   const isSelf = to === msgData.from;
 ;
 
@@ -652,20 +662,26 @@ export function online(msg){
   }
 }
 
-export function Unread(msg){
-  const divs = document.querySelectorAll('.user-container');
+export function Unread(msg) {
+  console.log("Unread notification received:", msg);
+  const divs = document.querySelectorAll(".user-container");
 
-  for (const user in msg.users) {
-  
-     for (let i = 0; i < divs.length; i++) {
-      if (divs[i].textContent.trim() === user) {
-        const usernameSpan = divs[i].querySelector('.username');
-        if (usernameSpan) {
-          usernameSpan.style.color = 'red';
-          console.log("red text changed");
-        }
-   
-}
+  // Check if msg.users exists and is an array
+  if (!msg.users || !Array.isArray(msg.users)) {
+    console.error("Invalid users data in notification:", msg);
+    return;
   }
-}
+
+  for (const user of msg.users) {
+    for (let i = 0; i < divs.length; i++) {
+      // Compare with user.name instead of user object
+      if (divs[i].textContent.includes(user.name)) {
+        const usernameSpan = divs[i].querySelector(".username");
+        if (usernameSpan) {
+          usernameSpan.style.color = "red";
+          console.log("Changed text color to red for user:", user.name);
+        }
+      }
+    }
+  }
 }

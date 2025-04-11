@@ -138,6 +138,18 @@ func OpenDatabase() *sql.DB {
 	return db
 }
 
+func isRedunat(AllUsers []ServerUser ,name ServerUser ) bool{
+	for _,i:= range AllUsers{
+		if i.Name == name.Name{
+			//fmt.Println("found user")
+			//fmt.Println(i.Name)
+			return true
+		}
+	}
+	
+	return false
+}
+
 func handleGetFriends(conn *websocket.Conn, to string) {
 
 	db := OpenDatabase()
@@ -146,15 +158,20 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 	var frinds []ServerUser
 	for _, i := range users {
 		name := GetUserID(db, i)
-		msg, read := GetLastMessage(db, name, to)
-		if msg == "" {
-			allUsers = append(allUsers, ServerUser{Name: i})
-		} else {
+		//instead of _ there was msg
+		_, read := GetLastMessage(db, name, to)
+		//if msg == "" {
+			if(!isRedunat(allUsers,ServerUser{Name: i})){
+
+				allUsers = append(allUsers, ServerUser{Name: i})
+
+		//	}
+		} //else {
 			frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
 			if read == 0 {
 				NotUsers = append(NotUsers, ServerUser{Name: i})
 			}
-		}
+		//}
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
 	conn.WriteJSON(message)
