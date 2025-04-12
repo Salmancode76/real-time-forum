@@ -143,6 +143,7 @@ export function loadUsers(){
 export function PM(msg){
   console.log("PM=====>"+msg.from)
   console.log("PM=====>"+msg.message)
+  if (currentChatUser.name !=msg.from) return;
  let messagesDiv = document.getElementById("messages");
   const now = new Date();
       const formattedTime = formatTime(now);
