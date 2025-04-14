@@ -163,23 +163,23 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 	for _, i := range users {
 		name := GetUserID(db, i)
 		//instead of _ there was msg
-		_, read := GetLastMessage(db, name, to)
-		//if msg == "" {
-		if (!isRedunat(allUsers, ServerUser{Name: i})) {
+		id,msg, read := GetLastMessage(db, name, to)
+		if msg == "" {
+			if (!isRedunat(allUsers, ServerUser{Name: i})) {
 
-			allUsers = append(allUsers, ServerUser{Name: i})
+				allUsers = append(allUsers, ServerUser{Name: i})
 
-			//	}
-		} //else {
-		frinds = append(frinds, ServerUser{Name: i}) // Friends = append(Friends, User)
-		if read == 0 {
-			NotUsers = append(NotUsers, ServerUser{Name: i})
+			}
+		} else {
+			frinds = append(frinds, ServerUser{Name: i, lastMsgId:id}) // Friends = append(Friends, User)
+			if read == 0 {
+				NotUsers = append(NotUsers, ServerUser{Name: i})
+			}
 		}
-		//}
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
 	conn.WriteJSON(message)
-	//fmt.Println(message)
+	fmt.Println(message)
 
 	// db := OpenDatabase()
 	// defer db.Close()
@@ -267,16 +267,16 @@ func notifyMassage(conn *websocket.Conn, m MyMessage) {
 	To := GetUserID(db, m.To)
 	name := GetUserName(db, m.From)
 	PMnotify = append(PMnotify, ServerUser{Name: name})
-	fmt.Println("the Pm notify ====>",PMnotify)
-	fmt.Println("the user sockets ====>",userSockets)
-	fmt.Println("the m.To ====>",m.To)
-	fmt.Println("socket user ===>",(*userSockets)[To])
+	fmt.Println("the Pm notify ====>", PMnotify)
+	fmt.Println("the user sockets ====>", userSockets)
+	fmt.Println("the m.To ====>", m.To)
+	fmt.Println("socket user ===>", (*userSockets)[To])
 	recipientConn, ok := (*userSockets)[To]
 	if ok {
 		nmmessage := ServerMessage{Type: "notify", Users: PMnotify}
 		PMnotify = []ServerUser{}
 		err := recipientConn.WriteJSON(nmmessage)
-		fmt.Println("notify pm sent and its=====>",nmmessage)
+		fmt.Println("notify pm sent and its=====>", nmmessage)
 		if err != nil {
 			log.Println("Error writing to WebSocket:", err)
 			return
