@@ -45,7 +45,6 @@ func GetChatHistory(user string, from string, offset int) []Message {
 	defer db.Close()
 
 	rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?) ORDER BY time DESC LIMIT 10 OFFSET ?", user, from, from, user, offset)
-	//rows, err := db.Query("SELECT from_id, to_id, is_read, message, time FROM messages ")
 
 	if err != nil {
 		fmt.Printf("Server >> Error getting chat history: %s", err)
@@ -74,6 +73,19 @@ func GetChatHistory(user string, from string, offset int) []Message {
 		}
 		messages = append(messages, msg)
 	}
+
+	stmt, err := db.Prepare(`
+		UPDATE messages
+		SET is_read = 1
+		WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)
+	`)
+
+	// Execute the prepared statement with the user IDs
+	result, err := stmt.Exec(user, from, from, user)
+	if err != nil {
+		fmt.Printf("Server >> Error getting chat history: %s", err)
+	}
+	fmt.Println("is read executed result", result)
 
 	return messages
 }
@@ -157,7 +169,7 @@ func getAllUsers(db *sql.DB) []string {
 // 	return names
 // }
 
-func GetLastMessage(db *sql.DB, senderId string, receiverId string) (string,int) {
+func GetLastMessage(db *sql.DB, senderId string, receiverId string) (string, int) {
 
 	var message string
 	var read int
@@ -168,16 +180,16 @@ func GetLastMessage(db *sql.DB, senderId string, receiverId string) (string,int)
     ORDER BY messageID DESC
     LIMIT 1`,
 		senderId, receiverId, receiverId, senderId,
-	).Scan(&message,&read)
+	).Scan(&message, &read)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "",1
+			return "", 1
 		} else {
 			log.Fatal(err)
 		}
 	}
 
-	return message ,read
+	return message, read
 }
 
 // func GetOtherUsersData(UserId int, activeUsers []int) []User {
