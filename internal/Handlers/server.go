@@ -83,7 +83,7 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		log.Printf("Received: %s", message)
+		//log.Printf("Received: %s", message)
 		if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
 			log.Printf("Write failed: %v", err)
 			return
@@ -112,10 +112,13 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 		onlineusers(app, conn)
 	case "get_chat_history":
 		handleGetChatHistoryMessage(conn, message)
+		SetRead(message.From, message.To)
 	case "read_message":
 		SetRead(message.From, message.To)
 	case "logout":
 		logoutUser(message.From, app)
+		UpdateOfflineUsers(app, message.From)
+
 	default:
 		log.Printf("Unsupported message type: %s", message.Type)
 
@@ -125,7 +128,8 @@ func handleWebSocketMessage(app *models.App, conn *websocket.Conn, message MyMes
 func logoutUser(id string, app *models.App) {
 	// fmt.Println("will remove log out user ====>",id)
 	delete(app.UserID, id)
-	// fmt.Println(app.UserID)
+
+	fmt.Println("removed ===>", app.UserID)
 
 }
 
@@ -263,7 +267,7 @@ func notifyMassage(conn *websocket.Conn, m MyMessage) {
 		nmmessage := ServerMessage{Type: "notify", Users: PMnotify}
 		PMnotify = []ServerUser{}
 		err := recipientConn.WriteJSON(nmmessage)
-
+		fmt.Println(nmmessage)
 		if err != nil {
 			log.Println("Error writing to WebSocket:", err)
 			return
