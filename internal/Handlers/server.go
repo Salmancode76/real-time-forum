@@ -261,13 +261,22 @@ func UpdateOnlineUsers(app *models.App) {
 
 func notifyMassage(conn *websocket.Conn, m MyMessage) {
 	var PMnotify []ServerUser
-	PMnotify = append(PMnotify, ServerUser{Name: m.From})
-	recipientConn, ok := (*userSockets)[m.To]
+
+	db := OpenDatabase()
+	defer db.Close()
+	To := GetUserID(db, m.To)
+	name := GetUserName(db, m.From)
+	PMnotify = append(PMnotify, ServerUser{Name: name})
+	fmt.Println("the Pm notify ====>",PMnotify)
+	fmt.Println("the user sockets ====>",userSockets)
+	fmt.Println("the m.To ====>",m.To)
+	fmt.Println("socket user ===>",(*userSockets)[To])
+	recipientConn, ok := (*userSockets)[To]
 	if ok {
 		nmmessage := ServerMessage{Type: "notify", Users: PMnotify}
 		PMnotify = []ServerUser{}
 		err := recipientConn.WriteJSON(nmmessage)
-		fmt.Println(nmmessage)
+		fmt.Println("notify pm sent and its=====>",nmmessage)
 		if err != nil {
 			log.Println("Error writing to WebSocket:", err)
 			return
