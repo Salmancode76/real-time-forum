@@ -174,8 +174,17 @@ export function showUsers(msg){
      let data =msg
      // update the div with the list of users
      const usersDiv = document.getElementById("user-list");
-    usersDiv.innerHTML = "";
-     const sorted = sort(data.users)
+   // usersDiv.innerHTML = "";
+
+
+
+      const currentUserName = getname();
+
+      const filteredUsers = data.users.filter(
+        (user) => user.name !== currentUserName
+      );
+
+      const sorted = sortid(filteredUsers);
      for (const user of sorted) {
        const userContainer = document.createElement("div");
          userContainer.className = "user-container";
@@ -278,8 +287,14 @@ export function showUsers(msg){
      // update the div with the list of users
      const usersDiv = document.getElementById("user-list");
      usersDiv.innerHTML = "";
-     //const sorted = sort(data.users)
-     for (const user of data.users) {
+  const currentUserName = getname();
+
+       const filteredUsers = data.users.filter(
+         (user) => user.name !== currentUserName
+       );
+
+     const sorted = sortid(filteredUsers);
+     for (const user of sorted) {
        const userContainer = document.createElement("div");
          userContainer.className = "user-container";
          userContainer.id = "user-" + user.name;
@@ -381,6 +396,24 @@ export function showUsers(msg){
   );
  }
 
+ function sortid(arr) {
+  if (!Array.isArray(arr)) {
+    return "Input is not an array.";
+  }
+
+  return arr.slice().sort((a, b) => {
+    const nameA = a.lastmsgfid ? a.lastmsgfid.toLowerCase() : ""; // Handle potential missing or undefined names
+    const nameB = b.lastmsgfid ? b.lastmsgfid.toLowerCase() : "";
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0; // Names are equal
+  });
+}
 
 
  function sort(arr) {

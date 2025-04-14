@@ -121,6 +121,7 @@ type ServerUser struct {
 	Username  string `json:"username"`
 	Privilege int    `json:"privilege"`
 	Password  string `json:"password"`
+	lastMsgId int `json:"lastmsgfid"`
 }
 
 type ServerMessage struct {
