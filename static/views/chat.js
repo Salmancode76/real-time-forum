@@ -226,6 +226,10 @@ export function showUsers(msg){
            make text white after click
      
             */
+             if (getname() === null) {
+               alert("Please login to send messages.");
+               window.location.href = "/login";
+             }
 
            const userState = getUserChateState(user.name);
            userState.set = 0;
@@ -328,7 +332,10 @@ export function showUsers(msg){
  
          userContainer.addEventListener("click", () => {
            //getHistoy()
-       
+         if (getname() === null) {
+           alert("Please login to send messages.");
+           window.location.href = "/login";
+         }
            const userState = getUserChateState(user.name);
            userState.set = 0;
            userState.isPrependMessages = false;
@@ -536,6 +543,11 @@ function showMessages(data, from, to, set, isPrependMessages) {
 
   form.addEventListener("submit",  (event)=> {
     event.preventDefault();
+    if(getname() === null){
+      alert("Please login to send messages.");
+               window.location.href = "/login";
+
+    }
     let nameUser = getname()
     const message = (messageInput.value).trim();
     if(message === ""){

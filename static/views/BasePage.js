@@ -19,7 +19,7 @@ export class BasePage {
 }
   
 
-   async CheckAuth(divName) {
+    async  CheckAuth(divName) {
     try {
       const response = await fetch("/auth-check");
 
