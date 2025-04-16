@@ -120,8 +120,19 @@ func Logout(app *models.App) http.HandlerFunc {
 		tempID := strconv.Itoa(user.UserID)
 
 		delete(app.Session, tempID)
+		delete(app.UserID, tempID)
 		delete(app.UserID, string(user.UserID))
 		w.WriteHeader(http.StatusNoContent)
+
+		 cookie := http.Cookie{
+            Name:     "userID",
+            Value:    "",
+            Path:     "/",
+            MaxAge:   -1,
+            HttpOnly: true,
+        }
+		        http.SetCookie(w, &cookie)
+
 		UpdateOfflineUsers(app,user.Username)
 
 	}

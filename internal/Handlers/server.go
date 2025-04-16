@@ -79,8 +79,14 @@ func HandleWebSocket(app *models.App, w http.ResponseWriter, r *http.Request) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("Connection closed unexpectedly: %v", err)
 				delete(app.UserID, cookie.Value)
-				//fmt.Println(app.UserID)
-			}
+				delete(app.Session, cookie.Value)
+					delete(*userSockets, cookie.Value)
+					
+					// Notify other users about offline status
+					username, exists := app.UserID[cookie.Value]
+					if exists {
+						UpdateOfflineUsers(app, username)
+					}			}
 			return
 		}
 		//log.Printf("Received: %s", message)
@@ -164,11 +170,17 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 		name := GetUserID(db, i)
 		//instead of _ there was msg
 		id,msg, read := GetLastMessage(db, name, to)
+		fmt.Println()
+		fmt.Println("the last message ====>", msg)
+		fmt.Println("the last message id ====>", id)
+		fmt.Println("the last message read ====>", read)
 		if msg == "" {
 			if (!isRedunat(allUsers, ServerUser{Name: i})) {
 
 				allUsers = append(allUsers, ServerUser{Name: i})
-
+if read == 0 {
+				NotUsers = append(NotUsers, ServerUser{Name: i})
+			}
 			}
 		} else {
 			frinds = append(frinds, ServerUser{Name: i, lastMsgId:id}) // Friends = append(Friends, User)
@@ -176,7 +188,11 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 				NotUsers = append(NotUsers, ServerUser{Name: i})
 			}
 		}
+		if read == 0 {
+				NotUsers = append(NotUsers, ServerUser{Name: i})
+			}
 	}
+	
 	message := ServerMessage{Type: "frinds", Users: frinds}
 	conn.WriteJSON(message)
 	fmt.Println(message)

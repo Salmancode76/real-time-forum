@@ -4,6 +4,9 @@ import * as session from './Session.js'
 
 let currentChatUser = null;
 let currentUser = session.testCookie();
+let AllUsers = [];
+let AllFriends = [];
+let myuser = getname();
 
 let currentname=null;
 let userChatStates = {};
@@ -176,7 +179,14 @@ export function showUsers(msg){
      const usersDiv = document.getElementById("user-list");
    // usersDiv.innerHTML = "";
      const sorted = sort(data.users)
+     AllUsers = data.users;
+     let i=0;
      for (const user of sorted) {
+      if( myuser === user.name) continue;
+      if(AllFriends !== null){
+               if(AllFriends.some(frie => frie.name === user.name)  || user.name === undefined) continue;
+
+      }
        const userContainer = document.createElement("div");
          userContainer.className = "user-container";
          userContainer.id = "user-" + user.name;
@@ -279,7 +289,11 @@ export function showUsers(msg){
      const usersDiv = document.getElementById("user-list");
      usersDiv.innerHTML = "";
      const sorted = sortid(data.users)
+     AllFriends = data.users;
      for (const user of sorted) {
+         
+      if(user.name === undefined) continue;
+      console.log(user.name);
        const userContainer = document.createElement("div");
          userContainer.className = "user-container";
          userContainer.id = "user-" + user.name;
@@ -317,6 +331,9 @@ export function showUsers(msg){
            const userState = getUserChateState(user.name);
            userState.set = 0;
            userState.isPrependMessages = false;
+                    document
+                      .getElementById("user-" + user.name)
+                      .querySelector(".username").style.color = "white";
            // isPrependMessages = false;
            console.log(
              `Clicked on user: ${user.name}, reset state to: set=${userState.set}`
@@ -690,8 +707,12 @@ export function Unread(msg) {
     console.error("Invalid users data in notification:", msg);
     return;
   }
+            console.log("8778");
 
+  
   for (const user of msg.users) {
+            console.log("8778");
+
     for (let i = 0; i < divs.length; i++) {
       // Compare with user.name instead of user object
       if (divs[i].textContent.includes(user.name)) {

@@ -178,10 +178,11 @@ func GetLastMessage(db *sql.DB, senderId string, receiverId string) (int,string,
 	err := db.QueryRow(`
     SELECT  messageID,message, is_read FROM messages
     WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)
-    ORDER BY messageID ASC
+    ORDER BY messageID DESC
     LIMIT 1`,
 		senderId, receiverId, receiverId, senderId,
 	).Scan(&messageID,&message, &read)
+	
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return 0,"", 1

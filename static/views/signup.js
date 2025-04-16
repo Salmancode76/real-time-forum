@@ -109,15 +109,14 @@ export class signup  extends BasePage{
                 email: document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value.trim(),
             };
-            /* COMMENTED FOR TESTING
             const validationResult = this.validationSignup(formData);
 
             if (validationResult !== true) {
-               // alert(validationResult);
+                //alert(validationResult);
                 document.getElementById("res").innerText = "Error:  "+ validationResult;
                 return;
             }
-                */
+                
 
             try {
                 const response = await fetch('/sign', {
