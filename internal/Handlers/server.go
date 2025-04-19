@@ -164,6 +164,9 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 		name := GetUserID(db, i)
 		//instead of _ there was msg
 		id,msg, read := GetLastMessage(db, name, to)
+		if read == 0 {
+			NotUsers = append(NotUsers, ServerUser{Name: i})
+		}
 		if msg == "" {
 			if (!isRedunat(allUsers, ServerUser{Name: i})) {
 
@@ -172,9 +175,7 @@ func handleGetFriends(conn *websocket.Conn, to string) {
 			}
 		} else {
 			frinds = append(frinds, ServerUser{Name: i, lastMsgId:id}) // Friends = append(Friends, User)
-			if read == 0 {
-				NotUsers = append(NotUsers, ServerUser{Name: i})
-			}
+			
 		}
 	}
 	message := ServerMessage{Type: "frinds", Users: frinds}
@@ -198,6 +199,7 @@ func handleGetUsersMessage(conn *websocket.Conn) {
 	message = ServerMessage{Type: "notify", Users: NotUsers}
 	NotUsers = []ServerUser{}
 	conn.WriteJSON(message)
+	fmt.Println(NotUsers)
 
 }
 

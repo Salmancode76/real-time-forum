@@ -169,7 +169,7 @@ func getAllUsers(db *sql.DB) []string {
 // 	return names
 // }
 
-func GetLastMessage(db *sql.DB, senderId string, receiverId string) (int,string, int) {
+func GetLastMessage(db *sql.DB, senderId string, receiverId string) (int, string, int) {
 
 	var message string
 	var read int
@@ -178,19 +178,21 @@ func GetLastMessage(db *sql.DB, senderId string, receiverId string) (int,string,
 	err := db.QueryRow(`
     SELECT  messageID,message, is_read FROM messages
     WHERE (from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)
-    ORDER BY messageID ASC
+    ORDER BY messageID DESC
     LIMIT 1`,
 		senderId, receiverId, receiverId, senderId,
-	).Scan(&messageID,&message, &read)
+	).Scan(&messageID, &message, &read)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0,"", 1
+			return 0, "", 1
 		} else {
 			log.Fatal(err)
 		}
 	}
-
-	return messageID,message, read
+	if read == 0 {
+		fmt.Println("found one unread message from senderID and reciverID", senderId, receiverId)
+	}
+	return messageID, message, read
 }
 
 // func GetOtherUsersData(UserId int, activeUsers []int) []User {
